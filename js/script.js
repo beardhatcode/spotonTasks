@@ -12,8 +12,19 @@ add Db support
 
 function spotonTasks(){
 return {
-'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 rulling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}],"display":{"size":6.283185307179586}},
+'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 rulling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}]},
 
+'display':{
+		'full':{
+			'startDeg': 1.5*Math.PI,
+			'endDeg':	3.5*Math.PI
+			},
+		'half':{
+			'startDeg': 1.0*Math.PI,
+			'endDeg':	2.0*Math.PI
+			},
+		'current':'full'
+		},
 
 'data' : {
 			'blankTask' : {'n':'New subtask','g':0,'s':0},
@@ -77,15 +88,32 @@ return {
 			if(e.target.nodeName.toLowerCase() != 'input'){
 				
 				switch((e.shiftKey? "+":"-") + e.keyCode){
-					case '-46':
-					case '+46':
+					case '-46': // del
+					case '+46': // shift + del
 						e.data.o.remove()
 					break;
-					case '-45':
+					case '-45':// ins
 						e.data.o.add('neighbour');
 					break;
-					case '+45':
+					case '+45': // shift + ins
 						e.data.o.add('child');
+					break;
+					case '-33': //pageUp
+					case '-38': // Arrow Up
+						e.data.o.keyboardNav('lvlUp');
+					break;
+					case '-34': // Page Down
+					case '-40': // Arrow Down
+						e.data.o.keyboardNav('lvlDown');
+					break;
+					case '-37': // Arrow left
+						e.data.o.keyboardNav('turnCCW');
+					break;
+					case '-39': // Arrow left
+						e.data.o.keyboardNav('turnCW');
+					break;
+					case '-36': //home
+						e.data.o.keyboardNav('goHome');
 					break;
 				}
 
@@ -163,13 +191,6 @@ return {
  *                     start of task changing methods                        *
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
- 
-
-
-
-
-
-
 
 
 /* updateValue (setter)
@@ -221,6 +242,7 @@ this.store()
 	if(typeof this.data.tasksById[task.p] == "undefined"){
 		log("ERR: can't find tasks neighbours");
 		//TODO: alert user
+		
 		return;
 	}
 		
@@ -309,9 +331,8 @@ this.store()
 			parent.c = [blankTask];		
 		}else{
 			//extra task, resize
-	//		parent.c = 
 			parent.c.push(blankTask);
-			this.updateS(blankTask.id,50);
+			this.updateS(blankTask.id,100/parent.c.length);
 		}
 		
 		this.mouse.lastClicked = blankTask.id;
@@ -343,10 +364,10 @@ this.store()
 		
 		if(typeof parent == 'undefined'){
 			log('ERR: could not remove , because base task');
+			delete task.c;
 			//TODO alert user
 			return;		
 		}
-
 		for(i in parent.c){
 			if(parent.c[i]==task){
 				this.updateS(task.id,0);
@@ -354,12 +375,19 @@ this.store()
 				break;
 			}	
 		}
-
+		this.mouse.lastClicked = parent.id;
+		this.fillSidebar(parent.id);
 	}
 	this.store();
 },
 
 
+/*
+ * store
+ *
+ * function store tasks in localstorage
+ *
+ */
 'store':function(){
 	localStorage.setObject('spotonTasks',this.tasks);	
 	log('saved',this.tasks);
@@ -541,8 +569,8 @@ this.store()
 		screen = this.data.screen;
 
 	var data = ((arguments.length == 0 || data=="AF") ? this.tasks : data);
-	var startDeg=0;
-	var endDeg = this.tasks.display.size;
+	var startDeg=this.display.startDeg;
+	var endDeg =this.display.endDeg;
 	var subLvl = 0;
 	this.ctx.clearRect(0,0,screen.canvasX,screen.canvasY,1000)
 
@@ -568,8 +596,8 @@ this.store()
 										screen);
 
 	this.ctx.beginPath();
-	this.ctx.arc(screen.centerX,screen.centerY,screen.sizeMiddle,0,
-									this.tasks.display.size);
+	this.ctx.arc(screen.centerX,screen.centerY,screen.sizeMiddle,this.display.startDeg,
+									this.display.endDeg);
 	this.ctx.closePath();
 	this.ctx.fill();
 	this.ctx.stroke();
@@ -588,20 +616,44 @@ this.store()
  */
 
 'resize':function(){
-	this.$canvas
-		.attr('width',($(window).width()-260))
-		.attr('height',$(window).height()-10);	
-	
 	var screen = this.data.screen;
-	screen.canvasX = this.$canvas.attr('width');
-	screen.canvasY = this.$canvas.attr('height');
-	screen.centerX = Math.floor(screen.canvasX / 2);
-	screen.centerY = Math.floor(screen.canvasY / 2);
+	var $sideBar = $('#sideBar');
+	switch(this.display.current){
+	case 'half':
+		$sideBar.removeClass('full').addClass('half');
+
+		this.$canvas
+			.attr('width',($(window).width()))
+			.attr('height',$(window).height()-$sideBar.height());	
+	
+		screen.canvasX = this.$canvas.attr('width');
+		screen.canvasY = this.$canvas.attr('height');
+		screen.centerX = Math.floor(screen.canvasX / 2);
+		screen.centerY = Math.floor(screen.canvasY);
+	break;
+	case 'full':
+		$('#sideBar').removeClass('half').addClass('full');
+
+		this.$canvas
+			.attr('width',($(window).width()-$sideBar.width()))
+			.attr('height',$(window).height());	
+	
+		screen.canvasX = this.$canvas.attr('width');
+		screen.canvasY = this.$canvas.attr('height');
+		screen.centerX = Math.floor(screen.canvasX / 2);
+		screen.centerY = Math.floor(screen.canvasY / 2);
+	break;
+	}
+
+
 	
 	var ratio = (Math.min(screen.canvasX,screen.canvasY) / 500); 
 	screen.sizeA = this.data.screenD.sizeA * ratio;
 	screen.sizeB = this.data.screenD.sizeB * ratio;
 	screen.sizeMiddle = this.data.screenD.sizeMiddle * ratio;
+
+	this.display.startDeg = this.display[this.display.current].startDeg;
+	this.display.endDeg = this.display[this.display.current].endDeg;
 
 	this.ctx.lineStyle = '#032349';
 	this.ctx.lineWidth = 3;
@@ -609,6 +661,85 @@ this.store()
 	this.ctx.lineJoin= 'round';
 
 	this.draw();
+},
+
+/* keyboardNav
+ *
+ * function
+ *   navrigate using the keyboard
+ * 
+ * args
+ *   what	-	what to do
+ *				+lvlUp
+ *				+lvlDown
+ *				+turnCCW
+ *				+turnCW
+ *				+goHome
+ *   
+ */
+'keyboardNav' : function(what){
+	var task = this.data.tasksById[this.data.curTask],
+		curId= this.data.curTask,
+		i;
+	switch(what){
+		case 'lvlUp':
+			if(typeof task.c != 'undefined'
+				&& task.c.length > 0){
+					curId = task.c[0].id; 
+			}
+		break;
+		case 'lvlDown':
+			if(typeof task.p == 'number'){
+				curId = task.p; 
+			}else{
+				curId = 0;		
+			}
+		break;
+		case 'turnCCW':
+			if(typeof task.p == 'number'){
+				var parent = this.data.tasksById[task.p];
+				for(i in parent.c){
+					if(parent.c[i] == task && i != 0){
+						break;
+					}
+					curId = parent.c[i].id;
+				}
+			}else{
+				curId = 0;		
+			}
+		break;
+		case 'turnCW':
+			if(typeof task.p == 'number'){
+				var parent = this.data.tasksById[task.p];
+				for(i in parent.c){
+					if(parent.c[i] == task){
+						var a = ((i*1)+1) % parent.c.length;
+						curId = parent.c[a].id;
+						break;
+					}
+
+				}
+				
+			}else{
+				curId = 0;		
+			}
+		break;
+		case 'goHome':
+			curId = 0;		
+		break;
+		case 'lvlDown':
+			if(typeof task.p == 'number'){
+				curId = task.p; 
+			}else{
+				curId = 0;		
+			}
+		break;
+		
+	}
+	log(what,curId);
+	this.mouse.lastClicked = curId;
+	this.fillSidebar(curId);
+	
 },
 
 /*
