@@ -41,10 +41,21 @@
     <div id="main" role="main">
 		<SECTION id="sideBar">
 			<input type="text"  name="n" 	id="n" 				value="Loading.."><br>
-			<input type="range" name="s" 	id="s"			min=1 max=99  value=50><br>
-			<input type="range" name="g" 	id="g"			min=0 max=100 value=50><br>
-			<button id="addNeighbour">Add neighbour</button><button id="addChild">Add child</button>
-			<button id="removeTask">Remove</button>
+		
+			<section>
+				<label for="s">Size</label>
+				<input type="range" name="s" id="s"	min=1 max=99 value=50><br>
+				<span class="info">Change the procentual size of the task compared to it's parernt</span>
+			</section>
+			<section>
+				<label for="g">Completed</label>
+				<input type="range" name="g"		 id="g"						min=0 max=100 value=50><br>
+				<span class="info">Change the porcentual completion</span>
+			</section>
+			<section>
+				<button id="addNeighbour">Add neighbour</button><button id="addChild">Add child</button>
+				<button id="removeTask">Remove</button>
+			</section>
 		</SECTION>
 		<canvas id="canvas">Your browser sucks, please install a better one like chrome, safari, opra, ....</canvas>
     </div>
