@@ -210,7 +210,7 @@ table { border-collapse: collapse; border-spacing: 0; }
 
 /* =============================================================================
    Primary styles
-   Author: 
+   Author: gar_onn 
    ========================================================================== */
 
 body{
@@ -218,7 +218,7 @@ body{
 
 }
 #sideBar.full{
-   width: 250px;
+   width: 25%;
    height:100%;
    position:absolute;
    right:0;
@@ -239,7 +239,7 @@ body{
 #sideBar > section {
    background-color: hsl(220, 29%, 62%);
    border-radius: 10px;
-   margin: 15px 0 0 15px;
+   margin: 15px 10px 0 15px;
    padding: 5px;
 }
 
@@ -253,15 +253,44 @@ label {
 }
 
 
+#info code {
+	font-size: 18px;
+	background: grey;
+	border-radius: 6px;
+	min-width: 20px;
+	display: inline-block;
+	text-align: center;
+	height: 20px;
+	line-height: 20px;
+	padding-bottom: 5px;
+	margin: 1px 5px;
+}
+
+#info li{
+	list-style-type:none;	
+}
+
+#info ul{
+	padding: 0 0 0 20px;
+}
 
 
+#n {
+	background: transparent;
+	color: wheat;
+	font-size: large;
+	font-weight: bold;
+	border: 0;
+}
 
-
-
-
-
-
-
+/*
+ * TODO does ,not work 
+ * note no after 'after' non content elments line, input 
+*/
+#nameContainer::after{
+	content '&#x270E;'
+	color:red;
+}
 /* =============================================================================
    Non-semantic helper classes
    Please define your styles before this section.
