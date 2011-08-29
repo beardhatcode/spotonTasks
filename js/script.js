@@ -78,13 +78,12 @@ return {
 			&& typeof(localStorage.getItem('spotonTasks')) == 'string'
 			&& localStorage.getItem('spotonTasks').length > 10){
 	this.tasks =localStorage.getObject('spotonTasks');			
-	log('local',this.tasks)
 	}
 
 	//enable resizer
 	this.resize();
 	$(window).resize({o:this},function(e){e.data.o.resize()});
-	$(document.documentElement).keyup({o:this},function(e){
+	$(document.documentElement).keydown({o:this},function(e){
 			if(e.target.nodeName.toLowerCase() != 'input'){
 				
 				switch((e.shiftKey? "+":"-") + e.keyCode){
@@ -115,8 +114,25 @@ return {
 					case '-36': //home
 						e.data.o.keyboardNav('goHome');
 					break;
+					case '-67': //c
+					case '-71': //g
+						$('.g[type=range]').focus();
+					break;
+					case '-83': //s
+						$('.s[type=range]').focus();
+					break;
+					case '-78': //n
+						$('#n').select().focus();
+					break;
 				}
 
+			}else{
+				switch(e.keyCode){
+					case 27:  //esc
+						$("input").blur();
+					break;
+
+				}		
 			}
 		});
 
@@ -138,19 +154,19 @@ return {
 			}); 
 		
 		//handle updates
-		$('#n,#s,#g').change({o:this},function(e){
-				e.data.o.updateValue($(this).val(),$(this).attr('id'))
+		$('#n,.s,.g').bind("keyup change keydown",{o:this},function(e){
+				e.data.o.updateValue($(this).val(),$(this).attr('class'));
 			});
 	
 		//handel edits
 		$('#removeTask').click({o:this},function(e){
-				e.data.o.remove()
+				e.data.o.remove();
 			});
 		$('#addNeighbour').click({o:this},function(e){
-				e.data.o.add("neighbour")
+				e.data.o.add("neighbour");
 			});
 		$('#addChild').click({o:this},function(e){
-				e.data.o.add("child")
+				e.data.o.add("child");
 			});
 
 	// set base task to zero
@@ -414,14 +430,14 @@ this.store()
 			this.data.curTask = taskId;
 			var task = this.data.tasksById[taskId];
 			$('#n').val(task.n);	
-			$('#s').val(Math.round(task.s)).attr('value',Math.round(task.s));
-			$('#g').val(Math.round(task.g)).attr('value',Math.round(task.g));
+			$('.s').val(Math.round(task.s)).attr('value',Math.round(task.s));
+			$('.g').val(Math.round(task.g)).attr('value',Math.round(task.g));
 
 			// you can't change the gain of a task that has childs
 			if(typeof task.c == 'undefined' || task.c.length == 0){
-				$("#g").removeAttr('disabled');	
+				$(".g").removeAttr('disabled');	
 			}else{
-				$("#g").attr('disabled','disabled');
+				$(".g").attr('disabled','disabled');
 			}
 
 	},
@@ -635,8 +651,8 @@ this.store()
 		$('#sideBar').removeClass('half').addClass('full');
 
 		this.$canvas
-			.attr('width',($(window).width()-$sideBar.width()))
-			.attr('height',$(window).height());	
+			.attr('width',($(window).width()-$sideBar.width())-2)
+			.attr('height',$(window).height()-$('header').height()-$('footer').height()-5);	
 	
 		screen.canvasX = this.$canvas.attr('width');
 		screen.canvasY = this.$canvas.attr('height');
@@ -657,8 +673,6 @@ this.store()
 
 	this.ctx.lineStyle = '#032349';
 	this.ctx.lineWidth = 3;
-	this.ctx.lineCap = 'round';
-	this.ctx.lineJoin= 'round';
 
 	this.draw();
 },
@@ -793,7 +807,7 @@ var thing = spotonTasks().init('canvas');
 thing.AF();
 
 // verry bad things to get the CSS attr(value) working for the rages
-$("input[type='range']").change(function(){var a= $(this).val();$(this).attr('value',a);})
+$(".g,.s").change(function(){var a= $(this).val();$("."+this.className).attr('value',a);});
 
 
 
