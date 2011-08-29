@@ -40,28 +40,55 @@
     </header>
     <div id="main" role="main">
 		<SECTION id="sideBar">
-			<input type="text"  name="n" 	id="n" 				value="Loading.."><br>
+			
+			<section id="nameContainer">
+						<input type="text" name="n"		id="n"		 class="n" value="Loading..">
+			</section>
 		
 			<section>
 				<label for="s">Size</label>
-				<input type="range" name="s" id="s"	min=1 max=99 value=50><br>
+				<input type="range" name="s" class="s"	min=1 max=99 value=50>
+				<input name="s" min="1" max="99" type="number" class="s" value="" size=3>
+				<br>
 				<span class="info">Change the procentual size of the task compared to it's parernt</span>
 			</section>
 			<section>
 				<label for="g">Completed</label>
-				<input type="range" name="g"		 id="g"						min=0 max=100 value=50><br>
+				<input type="range" name="g" class="g"	min=0 max=100 value=50>
+				<input name="g" min="0" max="100" type="number" class="g" value="" size=3>
+				<br>
 				<span class="info">Change the porcentual completion</span>
 			</section>
 			<section>
 				<button id="addNeighbour">Add neighbour</button><button id="addChild">Add child</button>
 				<button id="removeTask">Remove</button>
 			</section>
+		<section id="info">
+			   <label>keyboard shortcuts</label>
+		       <header>
+			   		You can use thene keyboard shortcuts to navrigate and edit with more ease
+				</header>
+			   <H1>Movement (in taskSpot)</H1>
+			   <ul>
+			   		<li><code>&uarr;</code>go up one level</li>
+			   		<li><code>&darr;</code>go down one level</li>
+			   		<li><code>&larr;</code>turn counterclockwize</li>
+			   		<li><code>&rarr;</code>turn clockwize</li>
+			   		<li><code>n</code>change the task name</li>
+			   		<li><code>s</code>change the task size</li>
+			   		<li><code>c</code>change the completionrate</li>
+		        </ul>
+				<H1>While changeing variables</H1>
+				<ul>
+			        <li> <code>Esc</code>Return to taskSpot</li>
+				</ul>
+		</section>
 		</SECTION>
 		<canvas id="canvas">Your browser sucks, please install a better one like chrome, safari, opra, ....</canvas>
     </div>
     <footer>
-
-    </footer>
+		<a href="javascript:localStorage.removeItem('spotonTasks');window.location.reload();">clear localStorage</a>
+	</footer>
   </div> <!--! end of #container -->
 
 
