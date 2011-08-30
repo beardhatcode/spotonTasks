@@ -204,6 +204,27 @@ return {
 		
 },
 
+'buildTaskList': function(data){
+	var i;
+		if(arguments.length == 0){
+			var data = this.tasks;
+		}		
+
+		if(typeof data.c == 'undefined' || data.c.length == 0){
+			return $('<LI></LI>').html(data.n);	
+		}else{
+			var $tList = $('<UL></UL>');
+			for(i in data.c){
+				$tList.append(this.buildTaskList(data.c[i]));
+			}
+			$tList = $('<LI><input type=checkbox id="label_'+data.id+'"><label for="label_'+data.id+'">'+data.n+'</label></LI>').append($tList);
+			return $tList;
+		}
+	
+
+
+},
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *                     start of task changing methods                        *

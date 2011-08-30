@@ -232,6 +232,13 @@ left:0;
 }
 
 
+[type=checkbox]:checked~label ~ul {
+	display:none;
+	color:red;
+}
+
+
+
 #sideBar{
    position: fixed;
    top:0;
@@ -250,7 +257,7 @@ left:0;
    padding: 5px;
 }
 
-label {
+#sideBar label {
 	display: block;
 	margin: -15px 0 0px -14px;
 	color: wheat;
