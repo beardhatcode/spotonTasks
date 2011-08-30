@@ -217,24 +217,31 @@ body{
 /* cool gradient from: http://leaverou.me/css3patterns/#carbon */
 
 }
-#sideBar.full{
-   width: 25%;
-   height:100%;
-   position:absolute;
-   right:0;
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+}
+
+#taskList{
+    margin-left: 20%;
+    position: absolute;
+    width: 60%;
+    margin-right: 20%;
+}
+
+
+#sideBar{
+   position: fixed;
    top:0;
+   right:0;
+   width: 20%;
+   height:100%;
    background-color:#032349;
    }
 
 
-#sideBar.half{
-   height: 250px;
-   width:100%;
-   position:absolute;
-   left:0;
-   bottom:0;
-   background-color:#032349;
-   }
 
 #sideBar > section {
    background-color: hsl(220, 29%, 62%);

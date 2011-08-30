@@ -638,7 +638,6 @@ this.store()
 	var $sideBar = $('#sideBar');
 	switch(this.display.current){
 	case 'half':
-		$sideBar.removeClass('full').addClass('half');
 
 		this.$canvas
 			.attr('width',($(window).width()))
@@ -650,10 +649,9 @@ this.store()
 		screen.centerY = Math.floor(screen.canvasY);
 	break;
 	case 'full':
-		$('#sideBar').removeClass('half').addClass('full');
 
 		this.$canvas
-			.attr('width',($(window).width()-$sideBar.width())-2)
+			.attr('width',($(window).width()-$sideBar.width())-$('#taskList').width()-5)
 			.attr('height',$(window).height()-$('header').height()-$('footer').height()-5);	
 	
 		screen.canvasX = this.$canvas.attr('width');
