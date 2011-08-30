@@ -83,7 +83,9 @@ return {
 	//enable resizer
 	this.resize();
 	$(window).resize({o:this},function(e){e.data.o.resize()});
-	$(document.documentElement).keydown({o:this},function(e){
+	
+	//enable keyboard interaction
+	$(document.documentElement).keyup({o:this},function(e){
 			if(e.target.nodeName.toLowerCase() != 'input'){
 				
 				switch((e.shiftKey? "+":"-") + e.keyCode){
