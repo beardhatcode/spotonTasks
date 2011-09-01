@@ -138,6 +138,14 @@ return {
 			}
 		});
 
+	$("#taskList li span").live('click',{o:this},function(e){
+			e.data.o.fillSidebar($(this).attr('data-id'));
+			});
+	
+	$(".isDone").live('change',{o:this},function(e){
+			e.data.o.updateG($(this).attr('data-id'),($(this).is(':checked') ? 100 : 0));
+		});
+
 	this.$canvas
 		// handel mousemoves
 		.mousemove({o:this},function(e){
@@ -175,6 +183,7 @@ return {
 	this.data.tasksById[0] = this.tasks;
 	this.inTasksId(this.tasks);
 	this.fillSidebar(0);
+	this.buildTaskList();
 	this.draw();
 	return this;
 },
@@ -211,17 +220,29 @@ return {
 		}		
 
 		if(typeof data.c == 'undefined' || data.c.length == 0){
-			return $('<LI></LI>').html(data.n);	
+			return $('<LI></LI>')
+						.append($('<span></span>').attr('data-id',data.id).html(data.n))
+						.append($('<input type=checkbox>').attr({'data-id':data.id,
+													'checked':(data.g == 100 ? true : false)})
+											.addClass('isDone'));
 		}else{
 			var $tList = $('<UL></UL>');
 			for(i in data.c){
 				$tList.append(this.buildTaskList(data.c[i]));
 			}
-			$tList = $('<LI><input type=checkbox id="label_'+data.id+'"><label for="label_'+data.id+'">'+data.n+'</label></LI>').append($tList);
-			return $tList;
+			$tList = $('<LI><input type=checkbox class=expandChild ></LI>')
+						.append($('<span></span>').attr('data-id',data.id).html(data.n))
+					//	.append($('<input type=checkbox>').attr({'data-id':data.id,
+					//								'checked':(data.g == 100 ? true : false)})
+					//						.addClass('isDone'))
+						.append($tList);
+			
+			if(arguments.length==0){
+				$('#taskList').empty().append($tList);
+			}else{
+			    return $tList;
+			}
 		}
-	
-
 
 },
 
@@ -451,6 +472,10 @@ this.store()
 
 'fillSidebar': function(taskId){
 			this.data.curTask = taskId;
+			this.mouse.lastClicked = taskId;
+			$("#taskList .selected").removeClass('selected');
+			$('#taskList span[data-id='+taskId+']').addClass('selected')
+
 			var task = this.data.tasksById[taskId];
 			$('#n').val(task.n);	
 			$('.s').val(Math.round(task.s)).attr('value',Math.round(task.s));
