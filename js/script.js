@@ -101,17 +101,17 @@ return {
 					break;
 					case '-33': //pageUp
 					case '-38': // Arrow Up
-						e.data.o.keyboardNav('lvlUp');
+						e.data.o.keyboardNav('turnCCW');
 					break;
 					case '-34': // Page Down
 					case '-40': // Arrow Down
-						e.data.o.keyboardNav('lvlDown');
+						e.data.o.keyboardNav('turnCW');
 					break;
 					case '-37': // Arrow left
-						e.data.o.keyboardNav('turnCCW');
+						e.data.o.keyboardNav('lvlDown');
 					break;
-					case '-39': // Arrow left
-						e.data.o.keyboardNav('turnCW');
+					case '-39': // Arrow right
+						e.data.o.keyboardNav('lvlUp');
 					break;
 					case '-36': //home
 						e.data.o.keyboardNav('goHome');
