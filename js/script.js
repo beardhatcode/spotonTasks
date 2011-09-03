@@ -116,6 +116,9 @@ return {
 					case '-36': //home
 						e.data.o.keyboardNav('goHome');
 					break;
+					case '-68': // d
+						$('.isDone[data-id='+e.data.o.data.curTask+']').click();							
+					break;
 					case '-67': //c
 					case '-71': //g
 						$('.g[type=range]').focus();
@@ -182,8 +185,8 @@ return {
 	// set base task to zero
 	this.data.tasksById[0] = this.tasks;
 	this.inTasksId(this.tasks);
-	this.fillSidebar(0);
 	this.buildTaskList();
+	this.fillSidebar(0);
 	this.draw();
 	return this;
 },
@@ -357,6 +360,8 @@ this.store()
 			gain += (pTask.c[i].g * (pTask.c[i].s / 100));
 		}
 		
+		
+
 		this.updateG(task.p,gain);
 	}
 },
