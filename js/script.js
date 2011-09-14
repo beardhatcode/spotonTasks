@@ -1,6 +1,5 @@
 /* Author: Gar_onn
 
-add Localstorage support
 add Db support
 
 
@@ -143,10 +142,12 @@ return {
 
 	$("#taskList li span").live('click',{o:this},function(e){
 			e.data.o.fillSidebar($(this).attr('data-id'));
+			e.data.o.store();
 			});
 	
 	$(".isDone").live('change',{o:this},function(e){
 			e.data.o.updateG($(this).attr('data-id'),($(this).is(':checked') ? 100 : 0));
+			e.data.o.store();
 		});
 
 	this.$canvas
@@ -224,7 +225,7 @@ return {
 
 		if(typeof data.c == 'undefined' || data.c.length == 0){
 			return $('<LI></LI>')
-						.append($('<span></span>').attr('data-id',data.id).html(data.n))
+						.append($('<span></span>').attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n))
 						.append($('<input type=checkbox>').attr({'data-id':data.id,
 													'checked':(data.g == 100 ? true : false)})
 											.addClass('isDone'));
@@ -233,14 +234,15 @@ return {
 			for(i in data.c){
 				$tList.append(this.buildTaskList(data.c[i]));
 			}
-			$tList = $('<LI><input type=checkbox class=expandChild ></LI>')
-						.append($('<span></span>').attr('data-id',data.id).html(data.n))
+			$tList = $('<LI></LI>')
+						.append($('<span></span>').attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n))
 					//	.append($('<input type=checkbox>').attr({'data-id':data.id,
 					//								'checked':(data.g == 100 ? true : false)})
 					//						.addClass('isDone'))
 						.append($tList);
 			
 			if(arguments.length==0){
+				$tList = $('<ul></ul>').append($tList);
 				$('#taskList').empty().append($tList);
 			}else{
 			    return $tList;
@@ -330,7 +332,9 @@ this.store()
 
 	// update task
 	task.s = newVal*1;
-	
+
+
+
 	var curTot = newVal*1 + otherTot,
 		change = (100 - curTot);
 
@@ -361,9 +365,11 @@ this.store()
 		}
 		
 		
-
+		$('.isDone[data-id='+task.id+']').attr('checked',(task.g == 100 ? true : false));
 		this.updateG(task.p,gain);
 	}
+
+		$('span[data-id='+task.id+']').attr('data-g',Math.round(task.g) );
 },
 
 /*end of updaters*/
@@ -401,6 +407,7 @@ this.store()
 		}
 		
 		this.mouse.lastClicked = blankTask.id;
+		this.buildTaskList();
 		this.fillSidebar(blankTask.id);
 		this.store();
 	},
