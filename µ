@@ -219,37 +219,16 @@ body{
 }
 
 canvas{
-	position:fixed;
-	top:0;
-	left:0;
-}
-
-
-
-
-
-button {
-		color: white;
-		background-color: hsl(30, 100%, 50%);
-		border: 1px solid hsl(15, 100%, 50%);
-		border-radius: 5px;
-		font-weight: bold;
-		margin: 2px;
-		line-height: 20px;
-}
-
-button:hover {
-		background-color: hsl(20, 100%, 45%);
+position:fixed;
+top:0;
+left:0;
 }
 
 #taskList{
     margin-left: 30%;
     position: absolute;
     width: 50%;
-    margin-right: 21%;
-	height: 100%;
-	border-right: 3px solid hsl(30,100%,50%);
-	border-left: 3px solid hsl(30,100%,50%);
+    margin-right: 20%;
 }
 
 
@@ -269,68 +248,12 @@ margin-right: 8px;
 	font-size:xx-large;
 }
 
-#taskList,#sideBar {
-	background: hsla(60,100%,50%,0.05);
-}
-
-#taskList ul{
-	padding: 0 0 0 25px;
-	margin:0;
-	list-style: none;
-	z-index:0;
-}
-
-
-
-#taskList .selected, #taskList span:hover{
-	font-weight: bold;
-}
-
-
-#taskList .selected::before {
-	position: absolute;
-	left:0;
-	top:auto;
-	height: auto;
-	line-height: 1.7em;
-
-	display:block;
-	width: 100%;
-	height: 1.7em;
-	
+#taskList .selected{
 	background-color: hsl(60,100%,75%);
-	border: 2px solid hsl(50,100%,50%);
-	z-index:-1;
-
-	content: ""
+	border: 2px solid hsl(100,100%50%);
+	
 }
 
-
-#taskList span{
-	display:block;
-	width: 100%;
-	z-index:1;
-	line-height:1.7em;
-	cursor: pointer;
-}
-
-
-#taskList span::after {
-	position: absolute;
-	content: attr(data-g) "%";
-	right:25px;
-}
-
-#taskList span[data-g="100"]{
-	color: #AAA;
-}
-
-#taskList .isDone{
-	position: absolute;
-	right:10px;
-	top:auto;
-	height: 1.7em;
-}
 
 /*inster*/
 #sideBar{
@@ -339,15 +262,16 @@ margin-right: 8px;
    right:0;
    width: 20%;
    height:100%;
+   background-color:#032349;
    }
 
 
 
 #sideBar > section {
+   background-color: hsl(220, 29%, 62%);
    border-radius: 10px;
    margin: 15px 10px 0 15px;
    padding: 5px;
-   background-color: hsl(0,0%,75%);
 }
 
 #sideBar label {
@@ -362,7 +286,7 @@ margin-right: 8px;
 
 #info code {
 	font-size: 18px;
-	background: hsl(0,0%,95%);
+	background: grey;
 	border-radius: 6px;
 	min-width: 20px;
 	display: inline-block;
@@ -384,11 +308,20 @@ margin-right: 8px;
 
 #n {
 	background: transparent;
+	color: wheat;
 	font-size: large;
 	font-weight: bold;
 	border: 0;
 }
 
+/*
+ * TODO does ,not work 
+ * note no after 'after' non content elments line, input 
+*/
+#nameContainer::after{
+	content '&#x270E;'
+	color:red;
+}
 /* =============================================================================
    Non-semantic helper classes
    Please define your styles before this section.
@@ -426,25 +359,13 @@ margin-right: 8px;
    Modify as content requires.
    ========================================================================== */
 
-@media only screen and (max-width: 680px) {
+@media only screen and (min-width: 480px) {
   /* Style adjustments for viewports 480px and over go here */
-#main > section, #main > canvas{
-	display: block;
-	position: static;
-}
-
-#main > section{
-	width:100%;
-	border:0;
-	border-top: 3px solid hsl(30,50%,100%);
-	margin:0;
-}
 
 }
 
 @media only screen and (min-width: 768px) {
   /* Style adjustments for viewports 768px and over go here */
-
 
 }
 

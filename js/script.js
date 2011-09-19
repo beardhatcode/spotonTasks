@@ -50,11 +50,17 @@ return {
 						'offset' : 30
 					},
 			'colorScheme' : {
-					'hover' : 	['#4375B0','#AEC5E0'],
-					'normal': 	['#0F4688','#479AEB'],
-					'normal_selected':	['#E0CB48','#F6F0CB'],
-					'hover_selected': ['#FFAE56','#FFF8F0']
+					'hover' : 			['hsl(0,0%,50%)'	,'hsl(0,0%,70%)'],
+					'normal': 			['hsl(0,0%,75%)'	,'hsl(0,0%,95%)'],
+					'normal_selected':	['hsl(60,100%,75%)'	,'hsl(50,100%,50%)'],
+					'hover_selected': 	['hsl(50,100%,75%)'	,'hsl(40,100%,50%)']
 					}
+//			'colorScheme' : {
+//					'hover' : 	['#4375B0','#AEC5E0'],
+//					'normal': 	['#0F4688','#479AEB'],
+//					'normal_selected':	['#E0CB48','#F6F0CB'],
+//					'hover_selected': ['#FFAE56','#FFF8F0']
+//					}
 		},
 
 'mouse':{x:0,y:0,hover:0,lastClicked:0},
@@ -225,20 +231,33 @@ return {
 
 		if(typeof data.c == 'undefined' || data.c.length == 0){
 			return $('<LI></LI>')
-						.append($('<span></span>').attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n))
-						.append($('<input type=checkbox>').attr({'data-id':data.id,
-													'checked':(data.g == 100 ? true : false)})
-											.addClass('isDone'));
+						.append(
+							$('<span></span>')
+								.attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n)
+								.append(
+									$('<input type=checkbox>')
+										.attr({'data-id':data.id,
+										       'checked':(data.g == 100 ? true : false)})
+										.addClass('isDone')
+										)
+							)
 		}else{
 			var $tList = $('<UL></UL>');
 			for(i in data.c){
 				$tList.append(this.buildTaskList(data.c[i]));
 			}
 			$tList = $('<LI></LI>')
-						.append($('<span></span>').attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n))
-					//	.append($('<input type=checkbox>').attr({'data-id':data.id,
-					//								'checked':(data.g == 100 ? true : false)})
-					//						.addClass('isDone'))
+						.append(
+							$('<span></span>')
+								.attr({'data-id':data.id,'data-g':Math.round(data.g)})
+								.text(data.n)
+							//	.append($('<input type=checkbox>')
+							//		.attr({'data-id':data.id,
+							//			   'checked':(data.g == 100 ? true : false),
+							//			   'class':'isDone'}
+							//			 )
+							//       	   )
+					           )
 						.append($tList);
 			
 			if(arguments.length==0){
@@ -844,7 +863,8 @@ window.requestAnimFrame = (function(){
 			window.msRequestAnimationFrame     || 
 		   function(/* function */ callback, /* DOMElement */ element){
 			window.setTimeout(callback, 1000 / 60);
-			  };
+
+			};
 	  })();
 
 
