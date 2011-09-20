@@ -233,6 +233,7 @@ return {
 			return $('<LI></LI>')
 						.append(
 							$('<span></span>')
+								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
 								.attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n)
 								.append(
 									$('<input type=checkbox>')
@@ -249,6 +250,7 @@ return {
 			$tList = $('<LI></LI>')
 						.append(
 							$('<span></span>')
+								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
 								.attr({'data-id':data.id,'data-g':Math.round(data.g)})
 								.text(data.n)
 							//	.append($('<input type=checkbox>')
@@ -297,6 +299,7 @@ return {
 			case 'n':
 				var task = this.data.tasksById[this.data.curTask];
 				task.n = value;
+				this.buildTaskList();
 			break;
 			case 's':
 				this.updateS(this.data.curTask,value);
