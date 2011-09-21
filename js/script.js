@@ -11,7 +11,7 @@ add Db support
 
 function spotonTasks(){
 return {
-'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 rulling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}]},
+'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 ruling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}]}, // default task data
 
 'display':{
 		'full':{
@@ -63,7 +63,12 @@ return {
 //					}
 		},
 
-'mouse':{x:0,y:0,hover:0,lastClicked:0},
+'mouse':{
+		x:0,
+		y:0,
+		hover:0,
+		lastClicked:0
+		},
 
 /*
  * init (constructor function)
@@ -431,7 +436,7 @@ this.store()
 		this.mouse.lastClicked = blankTask.id;
 		this.buildTaskList();
 		this.fillSidebar(blankTask.id);
-		this.store();
+		this.store({id:blankTask.id,type:'add'});
 	},
 
 /* remove
@@ -472,7 +477,7 @@ this.store()
 		this.mouse.lastClicked = parent.id;
 		this.fillSidebar(parent.id);
 	}
-	this.store();
+	this.store({id:id,type:"del"});
 },
 
 
@@ -482,7 +487,7 @@ this.store()
  * function store tasks in localstorage
  *
  */
-'store':function(){
+'store':function(changedData){
 	localStorage.setObject('spotonTasks',this.tasks);	
 	log('saved',this.tasks);
 	},
