@@ -11,64 +11,62 @@ add Db support
 
 function spotonTasks(){
 return {
-'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 ruling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}]}, // default task data
+//tasks
+'tasks': {"n":"My Tasklist","id":0,"s":100,"g":55.51028636264,listId:0,"c":[{"n":"1 coding","g":60,"s":41,"c":[{"g":95,"n":"1.1 PHP","s":30,"id":2,"p":1},{"g":45,"n":"1.2 JS","s":70,"id":3,"p":1}],"id":1,"p":0},{"n":"2 ruling the world","g":"25","s":19,"id":4,"p":0},{"n":"3 Design","s":30,"g":79.8676212088,"c":[{"g":"100","n":"3.1 functional","s":50,"id":6,"p":5},{"g":"58","n":"3.2 haha","s":31.251,"id":7,"p":5},{"g":62.62087999999999,"n":"3.3 sander suckt","s":18.751,"c":[{"g":"34","n":"3.3.1 algem","s":47,"id":9,"p":8},{"g":"88","n":"3.3.2 de rest","s":53.001,"id":10,"p":8}],"id":8,"p":5}],"id":5,"p":0},{"g":"22","n":"4 lorem","s":10,"id":11,"p":0}]}, // default task data
 
 'display':{
-		'full':{
-			'startDeg': 1.5*Math.PI,
-			'endDeg':	3.5*Math.PI
-			},
-		'half':{
-			'startDeg': 1.0*Math.PI,
-			'endDeg':	2.0*Math.PI
-			},
-		'current':'full'
-		},
+	full:{
+		startDeg: 1.5*Math.PI,
+		endDeg:	3.5*Math.PI
+	},
+	half:{
+		startDeg: 1.0*Math.PI,
+		endDeg:	2.0*Math.PI
+	},
+		current:'full'
+},
 
-'data' : {
-			'blankTask' : {'n':'New subtask','g':0,'s':0},
-			'maxId':0,
-			'curTask' : 0,
-			'tasksById' : new Array(),
-			'changesMade': [],
-			'screenD':{
-						'sizeMiddle': 50,
-						'sizeA':50,
-						'maxA':3,
-						'sizeB':10,
-					},
+data : {
+	buffer: {},
+	blankTask : {n:'New subtask',g:0,s:0},
+	maxId:0,
+	curTask : 0,
+	tasksById : [],
+	changesMade: [],
+
+	screenD:{
+		sizeMiddle: 50,
+		sizeA:50,
+		maxA:3,
+		sizeB:10,
+	},
 		
-			'screen':{
-						'centerX': 200,
-						'centerY' : 200,
-						'sizeMiddle': 30,
-						'canvasX': 400,
-						'canvasY': 400,
-						'sizeA':50,
-						'maxA':3,
-						'sizeB':45,
-						'offset' : 30
-					},
-			'colorScheme' : {
-					'hover' : 			['hsl(0,0%,50%)'	,'hsl(0,0%,70%)'],
-					'normal': 			['hsl(0,0%,75%)'	,'hsl(0,0%,95%)'],
-					'normal_selected':	['hsl(60,100%,75%)'	,'hsl(50,100%,50%)'],
-					'hover_selected': 	['hsl(50,100%,75%)'	,'hsl(40,100%,50%)']
-					}
-//			'colorScheme' : {
-//					'hover' : 	['#4375B0','#AEC5E0'],
-//					'normal': 	['#0F4688','#479AEB'],
-//					'normal_selected':	['#E0CB48','#F6F0CB'],
-//					'hover_selected': ['#FFAE56','#FFF8F0']
-//					}
-		},
+	screen:{
+		centerX: 200,
+		centerY : 200,
+		sizeMiddle: 30,
+		canvasX: 400,
+		canvasY: 400,
+		sizeA:50,
+		maxA:3,
+		sizeB:45,
+		offset : 30
+	},
 
-'mouse':{
-		x:0,
-		y:0,
-		hover:0,
-		lastClicked:0
-		},
+	colorScheme : {
+		hover : 				['hsl(0,0%,50%)'	,'hsl(0,0%,70%)'],
+		normal: 				['hsl(0,0%,75%)'	,'hsl(0,0%,95%)'],
+		normal_selected:['hsl(60,100%,75%)'	,'hsl(50,100%,50%)'],
+		hover_selected:	['hsl(50,100%,75%)'	,'hsl(40,100%,50%)']
+	}
+},
+
+mouse:{
+	x:0,
+	y:0,
+	hover:0,
+	lastClicked:0
+},
 
 /*
  * init (constructor function)
@@ -80,14 +78,17 @@ return {
  *   canvasIdentifier : jQuery selector for the canvas
  *
  */
-'init':function(canvasIdentifier){
+init:function(canvasIdentifier){
+	
+	//get canvas and context
 	this.$canvas = 	$(canvasIdentifier);
 	this.ctx = 		this.$canvas[0].getContext('2d');
 
+	//load data from localstorage
 	if(Modernizr.localstorage == true 
-			&& typeof(localStorage.getItem('spotonTasks')) == 'string'
-			&& localStorage.getItem('spotonTasks').length > 10){
-	this.tasks =localStorage.getObject('spotonTasks');			
+			&& typeof(localStorage.getItem('tasks')) == 'string'
+			&& localStorage.getItem('tasks').length > 10){
+	this.tasks =localStorage.getObject('tasks');			
 	}
 
 	//enable resizer
@@ -96,7 +97,8 @@ return {
 	
 	//enable keyboard interaction
 	$(document.documentElement).keyup({o:this},function(e){
-			if(e.target.nodeName.toLowerCase() != 'input'){
+		//only on not input elements
+		if(e.target.nodeName.toLowerCase() != 'input'){
 				
 				switch((e.shiftKey? "+":"-") + e.keyCode){
 					case '-46': // del
@@ -142,18 +144,18 @@ return {
 				}
 
 			}else{
+				// on input elments
 				switch(e.keyCode){
 					case 27:  //esc
 						$("input").blur();
 					break;
-
 				}		
 			}
 		});
 
+	//enable mouse interaction
 	$("#taskList li span").live('click',{o:this},function(e){
 			e.data.o.fillSidebar($(this).attr('data-id'));
-			e.data.o.store();
 			});
 	
 	$(".isDone").live('change',{o:this},function(e){
@@ -162,16 +164,17 @@ return {
 		});
 
 	this.$canvas
-		// handel mousemoves
+		// handle mousemoves
 		.mousemove({o:this},function(e){
 			var screen = e.data.o.data.screen;
 			e.data.o.mouse.x=e.clientX - e.data.o.ctx.canvas.getBoundingClientRect().left;
 			e.data.o.mouse.y=e.clientY - e.data.o.ctx.canvas.getBoundingClientRect().top;
 			e.data.o.mouse.r=Math.sqrt(
-								Math.pow((screen.centerX-e.pageX),2) 
-							  + Math.pow((screen.centerY-e.pageY),2));
-							
+																	Math.pow((screen.centerX-e.pageX),2) 
+															  + Math.pow((screen.centerY-e.pageY),2)
+																);
 			})
+		
 		//handle clicks
 		.click({o:this},function(e){
 			e.data.o.mouse.lastClicked = e.data.o.mouse.hover;
@@ -183,7 +186,7 @@ return {
 				e.data.o.updateValue($(this).val(),$(this).attr('class'));
 			});
 	
-		//handel edits
+		//handle edits
 		$('#removeTask').click({o:this},function(e){
 				e.data.o.remove();
 			});
@@ -194,12 +197,17 @@ return {
 				e.data.o.add("child");
 			});
 
-	// set base task to zero
+	// set base task to id  zero
 	this.data.tasksById[0] = this.tasks;
+	
+	//create a quik tasklistAccespoint
 	this.inTasksId(this.tasks);
+
+	//fill the screen with data
 	this.buildTaskList();
 	this.fillSidebar(0);
 	this.draw();
+
 	return this;
 },
 
@@ -228,53 +236,16 @@ return {
 		
 },
 
-'buildTaskList': function(data){
-	var i;
-		if(arguments.length == 0){
-			var data = this.tasks;
-		}		
 
-		if(typeof data.c == 'undefined' || data.c.length == 0){
-			return $('<LI></LI>')
-						.append(
-							$('<span></span>')
-								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
-								.attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n)
-								.append(
-									$('<input type=checkbox>')
-										.attr({'data-id':data.id,
-										       'checked':(data.g == 100 ? true : false)})
-										.addClass('isDone')
-										)
-							)
+'hasChild': function(data){
+	if(typeof data.c == 'object'
+		&& data.c!=null
+		&& data.c.length > 0)
+		{
+			return true;
 		}else{
-			var $tList = $('<UL></UL>');
-			for(i in data.c){
-				$tList.append(this.buildTaskList(data.c[i]));
-			}
-			$tList = $('<LI></LI>')
-						.append(
-							$('<span></span>')
-								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
-								.attr({'data-id':data.id,'data-g':Math.round(data.g)})
-								.text(data.n)
-							//	.append($('<input type=checkbox>')
-							//		.attr({'data-id':data.id,
-							//			   'checked':(data.g == 100 ? true : false),
-							//			   'class':'isDone'}
-							//			 )
-							//       	   )
-					           )
-						.append($tList);
-			
-			if(arguments.length==0){
-				$tList = $('<ul></ul>').append($tList);
-				$('#taskList').empty().append($tList);
-			}else{
-			    return $tList;
-			}
+			return false;			
 		}
-
 },
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -299,8 +270,8 @@ return {
  *               > g (gain/progress)
  *
  */
-'updateValue' : function(value,id){
-		switch(id){
+'updateValue' : function(value,type){
+		switch(type){
 			case 'n':
 				var task = this.data.tasksById[this.data.curTask];
 				task.n = value;
@@ -313,7 +284,7 @@ return {
 				this.updateG(this.data.curTask,value);
 			break;
 		}	
-this.store()
+this.store({type:type,id:this.data.curTask})
 },
 
 /* Updaters 
@@ -453,11 +424,20 @@ this.store()
 'remove' : function(id){
 	if(typeof id == 'undefined'){
 		var task = this.data.tasksById[this.data.curTask];
-		if(confirm("delete? are you shure?\n"+task.n)){
-			this.remove(task.id);	
-		}
+		
+		messageBox({title:'Are you shure',
+								html:'You are about to delete \''+task.n+'\'  and all it\'s childs:<br>This action can <strong>not be undone</stong>',
+								buttons: [
+									{name:'Delete',type:'delete',do:function(that){that.remove(task.id)},arg:this},
+									{name:'Cancel',type:'cancel'}
+								]
+								})
+		
+//		if(confirm("delete? are you shure?\n"+task.n)){
+//			this.remove(task.id);	
+//		}
 	}else{
-		var task = this.data.tasksById[this.data.curTask],
+		var task = this.data.tasksById[id],
 			parent = this.data.tasksById[task.p],
 			i;
 		
@@ -475,9 +455,10 @@ this.store()
 			}	
 		}
 		this.mouse.lastClicked = parent.id;
+		this.buildTaskList();
 		this.fillSidebar(parent.id);
+		this.store({id:id,type:"del"});
 	}
-	this.store({id:id,type:"del"});
 },
 
 
@@ -487,11 +468,105 @@ this.store()
  * function store tasks in localstorage
  *
  */
-'store':function(changedData){
-	localStorage.setObject('spotonTasks',this.tasks);	
-	log('saved',this.tasks);
+'store':function(changeData){
+	localStorage.setObject('tasks',this.tasks);	
+	
+	if(typeof this.data.buffer[changeData.id] == "undefined")	{
+		this.data.buffer[changeData.id] = [changeData.type];	
+	}else{
+		if($.inArray(changeData.type,this.data.buffer[changeData.id]) ==  -1){
+			this.data.buffer[changeData.id].push(changeData.type);
+		}	
+	}
+
+	
+	localStorage.setObject('serverBuffer',this.data.buffer);	
+
+	log('saved',this.tasks,this.data.buffer,"saved");
 	},
 
+/*
+ * push 
+ *
+ * function
+ * 		push buffer data to server
+ *
+ */
+
+'push': function(){
+	var buffer = this.data.buffer;
+	var sender = {};
+	for(i in buffer){
+		for(j in buffer[i]){
+			switch(buffer[i][j]){
+			case "del": sender["del|"+i] = 'y';break;
+			case "add": sender["add|"+i] = this.data.tasksById[i].p;
+									sender['n|'+i] = this.data.tasksById[i].n;
+									sender['g|'+i] = this.data.tasksById[i].g;
+									sender['s|'+i] = this.data.tasksById[i].s;
+			break;
+			case 'n': sender['n|'+i] = this.data.tasksById[i].n;break;
+			case 'g': sender['g|'+i] = this.data.tasksById[i].g;break;
+			case 's': sender['s|'+i] = this.data.tasksById[i].s;break;
+			}
+		}
+
+	}
+
+	var that = this;
+	if(this.tasks.listId == 0){
+		$.post("ajax.php?action=list&listId=null", {data:JSON.stringify(this.data.tasksById)},
+			 function(data){
+				if(data.succes == true){
+					that.data.buffer = {};
+					that.tasks =  data.list;
+					that.data.tasksById = [that.tasks];
+					that.inTasksId(that.tasks);
+					that.buildTaskList();
+					log("stuff updated",that)
+				}else{
+						messageBox(
+							{title:'Error',
+							 type:'error',
+							 html: 'An error occured while creating a new list!<br><ul><li>'+data.warnings.join('<LI>')+'</ul>',
+							 buttons: [
+											 		{name: 'Cancel',
+													 type: 'close'}
+											 ],
+							 extra: data.requestedActions
+							}	
+						
+					);				
+				}
+			}, "json");
+	}else{
+		$.post("ajax.php?action=list&listId="+(this.tasks.listId || "null"), {data:sender},
+			 function(data){
+		    console.log(data); 
+				if(data.succes == true){
+					that.data.buffer = {};
+					that.tasks =  data.list;
+					that.data.tasksById = [that.tasks];
+					that.inTasksId(that.tasks);
+					that.buildTaskList();
+					log("stuff updated",that)
+				}else{
+						messageBox(
+							{title:'Error',
+							 type:'error',
+							 html: 'An error occured while creating a new list!<br><ul><li>'+data.warnings.join('<LI>')+'</ul>',
+							 buttons: [
+											 		{name: 'Cancel',
+													 type: 'close'}
+											 ],
+							 extra: data.requestedActions
+							}	
+						
+					);				
+				}
+			}, "json");
+	}	
+},
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *                      end of task changing methods                         *
@@ -521,7 +596,7 @@ this.store()
 			$('.g').val(Math.round(task.g)).attr('value',Math.round(task.g));
 
 			// you can't change the gain of a task that has childs
-			if(typeof task.c == 'undefined' || task.c.length == 0){
+			if(!this.hasChild(task)){
 				$(".g").removeAttr('disabled');	
 			}else{
 				$(".g").attr('disabled','disabled');
@@ -529,9 +604,69 @@ this.store()
 
 	},
 
+/*
+ * buildTasksList
+ *
+ * function
+ *   make the DOM elements for the tasklist
+ *
+ * args
+ *   data	-	self-filled (parrent)
+ */
+
+
+'buildTaskList': function(data){
+	var i;
+		if(arguments.length == 0){
+			var data = this.tasks;
+		}		
+
+		if(!this.hasChild(data)){
+			return $('<LI></LI>')
+						.append(
+							$('<span></span>')
+								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
+								.attr({'data-id':data.id,'data-g':Math.round(data.g)}).html(data.n)
+								.append(
+									$('<input type=checkbox>')
+										.attr({'data-id':data.id,
+										       'checked':(data.g == 100 ? true : false)})
+										.addClass('isDone')
+										)
+							)
+		}else{
+			var $tList = $('<UL></UL>');
+			for(i in data.c){
+				$tList.append(this.buildTaskList(data.c[i]));
+			}
+			$tList = $('<LI></LI>')
+						.append(
+							$('<span></span>')
+								.addClass(((this.mouse.lastClicked == data.id) ? 'selected':null))
+								.attr({'data-id':data.id,'data-g':Math.round(data.g)})
+								.text(data.n)
+							//	.append($('<input type=checkbox>')
+							//		.attr({'data-id':data.id,
+							//			   'checked':(data.g == 100 ? true : false),
+							//			   'class':'isDone'}
+							//			 )
+							//       	   )
+					           )
+						.append($tList);
+			
+			if(arguments.length==0){
+				$tList = $('<ul></ul>').append($tList);
+				$('#taskList').empty().append($tList);
+			}else{
+			    return $tList;
+			}
+		}
+
+},
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
- *                       end of HTML edits (sidebar)                         *
+ *                       end of HTML edits                                   *
  *                                                                           *
  *                       start of drawing on canvas                          *
  *                                                                           *
@@ -782,8 +917,7 @@ this.store()
 		i;
 	switch(what){
 		case 'lvlUp':
-			if(typeof task.c != 'undefined'
-				&& task.c.length > 0){
+			if(this.hasChild(task)){
 					curId = task.c[0].id; 
 			}
 		break;
@@ -856,9 +990,73 @@ this.store()
 }
 
 
+function messageBox(data){
+	var $message = $('#message'),
+			$buttons = $('<div id="buttonContainer"></div>');
+	$message.attr('data-type',data.type || 'normal')
+	$message.find('h1').html(data.title || 'Message');
+	$message.find('#inMessage').html(data.html);
+	
+	if(typeof data.buttons == 'undefined'){
+		data.buttons = [{name:'ok',type:'ok'}];				
+	}
+	
+	for(var btnId in data.buttons){
+		var btn = data.buttons[btnId];
+		$('<button>').text(btn.name)
+							 .click({btn:btn},
+							 				function(e){
+												try{
+												e.data.btn.do(e.data.btn.arg);
+												}catch(err){	}
+											}
+													
+										)
+							 .attr('data-type',btn.type)
+							 .appendTo($buttons)
+	}
+
+	if(data.extra == "login"){
+		$message.attr('data-specialfunction','login')
+	}else{
+		$message.attr('data-specialfunction','none')
+	}
+
+	$('#buttonContainer').replaceWith($buttons);
+
+	$('#messageOverlay').addClass('show');
+	$('#messageClose , #buttonContainer>button').click(function(){$('#messageOverlay').removeClass('show messageOnly')});
+}
 
 
+function oUser(){
+	this.id = 0;
+	this.sid = 0;
+	this.lists = 0;
+}
 
+oUser.prototype.login= function(){
+	log($('#loginForm').serialize())
+	$.post('ajax.php?action=login',$('#loginForm').serialize(),function(data){
+						alert('hey');
+						log(data);
+						if(data.user.logged==true){
+						}else{
+							alert('login failed');
+						}
+
+					},'json')			
+}
+
+
+var user = new oUser();
+
+$('#loginForm').submit(
+	function(e){
+		e.preventDefault();
+		user.login();
+	}
+)
 
 // crossbrowser rquestAnimation frame
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -888,7 +1086,7 @@ Storage.prototype.getObject = function(key) {
 
 
 
-
+var userData = {userId:0,userSid:0}; //TODO
 var thing = spotonTasks().init('canvas');
 thing.AF();
 
