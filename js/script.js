@@ -394,7 +394,7 @@ this.store({type:type,id:this.data.curTask})
 		blankTask.p = parent.id;
 		blankTask.g = parent.g; 
 		this.data.tasksById[blankTask.id] = blankTask;
-		if(typeof parent.c == 'undefined' || parent.c.length == 0){
+		if(!this.hasChild(parent)){
 			// subtask of 100%	
 			blankTask.s = 100;
 			parent.c = [blankTask];		
@@ -407,8 +407,7 @@ this.store({type:type,id:this.data.curTask})
 		this.mouse.lastClicked = blankTask.id;
 		this.buildTaskList();
 		this.fillSidebar(blankTask.id);
-		this.store({id:blankTask.id,type:'add'});
-	},
+		this.store({id:blankTask.id,type:'add'});	},
 
 /* remove
  *
