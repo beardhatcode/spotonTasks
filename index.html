@@ -34,9 +34,12 @@
 
 <body>
 
-  <div id="container">
+	<div id="container">
     <header>
-
+			<nav>
+				<a href="newlist.do">Create a new List</a> &bull;
+				<a href="javascript:thing.push();void(0);" id="uploadListBtn">Upload List</a> 
+			</nav>
     </header>
     <div id="main" role="main">
 	<canvas id="canvas">Your browser does not support canvas, please install a better one like chrome, safari, opera, ....</canvas>
@@ -66,6 +69,7 @@
 				<button id="addNeighbour">Add neighbour</button><button id="addChild">Add child</button>
 				<button id="removeTask">Remove</button>
 			</section>
+	
 		<section id="info">
 			   <label>keyboard shortcuts</label>
 		       <header>
@@ -92,8 +96,25 @@
 		</section>
 		</section>
     </div>
+
+	<div id="messageOverlay">
+		<section id="message" data-type="normal" data-specialfunction="none">
+	        <header><H1></H1><span id="messageClose">&otimes;</span></header>
+	        <div id="inMessage"></div>
+					<div id="specialFunctionMessage">
+						<form id="loginForm" class="login">
+							username:	<input type="text" name="username" id="username"><br>
+							password:  <input type="password" name="password" id="password" >
+							<input type="submit" name="login" value="login" >
+						</form>
+					
+					</div>
+					<div id="buttonContainer"></div>
+	        <footer></footer>
+		</section>
+	</DIV>
     <footer>
-		<a href="javascript:localStorage.removeItem('spotonTasks');window.location.reload();">clear localStorage</a>
+		<a href="javascript:localStorage.removeItem('tasks');window.location.reload();">clear localStorage</a>
 		&bull; a gar_onn production
 	</footer>
   </div> <!--! end of #container -->
