@@ -213,11 +213,79 @@ table { border-collapse: collapse; border-spacing: 0; }
    Author: gar_onn 
    ========================================================================== */
 
-body,html{
+body,html,#main{
 /* cool gradient from: http://leaverou.me/css3patterns/#carbon */
 height:100%
 min-height:100%;
+width:100%;
 }
+
+header > a{
+	color:red;				
+}
+
+
+/* message box*/
+#message,#messageOverlay{
+	display:none;
+}
+
+.show #message, .onlyMessage #message{
+    display: block;
+
+    border: 1px solid black;
+    z-index: 999;
+    background-color: white;
+    position: fixed;
+    top: 25%;
+    right: 25%;
+    left: 25%;
+}
+
+#messageOverlay.show{
+    z-index: 999;
+    height: 100%;
+    width: 100%;
+    background-color: hsla(0, 0%, 0%, .75);
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+#messageClose{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+#messageClose:hover::before{
+	content: "close";
+}	
+
+
+#message header{
+	padding: 0em 1em;
+}
+
+
+[data-specialfunction="none"]>#specialFunctionMessage *{
+	display: none;				
+}
+
+[data-specialfunction="login"] .login{
+	display: block;				
+}
+
+
+#buttonContainer{
+	text-align: right;
+	padding: .5em;
+	background: grey;
+	margin-top: 1em;
+}
+/* the canvas */
 
 canvas{
 	position:fixed;
@@ -226,6 +294,23 @@ canvas{
 }
 
 
+/*container*/
+
+#container > header {
+	position: fixed;
+	top:0;
+	height:20px;
+	line-height:20px;
+	z-index:1;
+}
+
+#container > footer {
+	position: absolute;
+	bottom: 0;
+	height:20px;
+	line-height: 20px;
+	z-index:1;
+}
 
 
 
@@ -252,19 +337,6 @@ button:hover {
 	border-right: 3px solid hsl(30,100%,50%);
 	border-left: 3px solid hsl(30,100%,50%);
 }
-
-
-/* the expand child btns *//*
-.expandChild:checked~ul {
-	display:none;
-	color:red;
-}
-
-.expandChild{
-margin-left: -20px;
-margin-right: 8px;
-}
-*/
 
 #taskList>ul>li>span{
 	font-size:xx-large;
@@ -390,12 +462,6 @@ margin-right: 8px;
 	border: 0;
 }
 
-footer {
-	position: absolute;
-	bottom: 0;
-	height:20px;
-	line-height: 20px;
-}
 
 
 /* =============================================================================
