@@ -93,6 +93,19 @@ class User
 		DataPlotter::succeeded();
 	}
 	
+	public function getLists(){
+		$qUserList = $this->db->prepare('SELECT lists . * 
+												FROM  `privileges` 
+												RIGHT JOIN  `lists` ON  `privileges`.`list` =  `lists`.`id` 
+												WHERE `privileges`.`user` =:user
+												LIMIT 0 , 30');				
+		$qUserList->execute(array('user'=>$this->user['id']));
+		
+		$aUserLists = $qUserList->fetchAll();
+		DataPlotter::data('lists',$aUserLists);
+		return $aUserLists;
+	}
+	
 
 	public function login($p_sName,$p_sPass){
 
@@ -111,10 +124,12 @@ class User
 				$qUpdateSid->execute(array("sid"=>$newSid,"id"=>$this->user['id']));
 				
 				$this->user['sid'] = $newSid;
+				return true;
 			}else{
 			$this->user = array('name'	=>'annonymous',
 													 'id'		=>	0);
 							
+			return false;
 			}
 
 	}

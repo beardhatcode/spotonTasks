@@ -3,8 +3,9 @@
 include('include.php');
 
 switch($_GET['action']){
+	case 'logout':
 	case 'login':
-		$oUser->login($_POST['username'],$_POST['password']);
+		include('php/user.inc.php');
 	break;	
 	case 'list':
 		include('php/list.inc.php');
