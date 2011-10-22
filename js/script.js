@@ -166,9 +166,10 @@ init:function(canvasIdentifier){
 	this.$canvas
 		// handle mousemoves
 		.mousemove({o:this},function(e){
-			var screen = e.data.o.data.screen;
-			e.data.o.mouse.x=e.clientX - e.data.o.ctx.canvas.getBoundingClientRect().left;
-			e.data.o.mouse.y=e.clientY - e.data.o.ctx.canvas.getBoundingClientRect().top;
+			var screen = e.data.o.data.screen,
+					boundingRect =  e.data.o.ctx.canvas.getBoundingClientRect();
+			e.data.o.mouse.x=e.clientX - boundingRect.left;
+			e.data.o.mouse.y=e.clientY - boundingRect.top;
 			e.data.o.mouse.r=Math.sqrt(
 																	Math.pow((screen.centerX-e.pageX),2) 
 															  + Math.pow((screen.centerY-e.pageY),2)
@@ -553,7 +554,7 @@ this.store({type:type,id:this.data.curTask})
 						messageBox(
 							{title:'Error',
 							 type:'error',
-							 html: 'An error occured while creating a new list!<br><ul><li>'+data.warnings.join('<LI>')+'</ul>',
+							 html: 'An error occured pushing data to server!<br><ul><li>'+data.warnings.join('<LI>')+'</ul>',
 							 buttons: [
 											 		{name: 'Cancel',
 													 type: 'close'}
@@ -1015,7 +1016,7 @@ function messageBox(data){
 							 .appendTo($buttons)
 	}
 
-	if(data.extra == "login"){
+	if($.inArray('login',data.extra) != -1){
 		$message.attr('data-specialfunction','login')
 	}else{
 		$message.attr('data-specialfunction','none')
