@@ -97,6 +97,7 @@ class Task {
 
 
 	public function del(){
+		$this->resize(0);
 		$qDel = $this->TaskList->db->prepare("DELETE FROM `tasks` WHERE `tasks`.`id` = :id;");
 		$qDel->bindValue(":id",$this->iId);
 		$iNumRows = $qDel->execute();
