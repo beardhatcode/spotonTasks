@@ -4,13 +4,27 @@
 */
 
 function spotonTasks(element, list) {
+
+	var newId = 0,
+	i = -1;
+
+	while (newId === 0) {
+		if (localStorage.getItem('tasks' + i) === null) {
+			// just to be shure
+            localStorage.removeItem('serverBuffer' + i);
+			newId = i;
+		} else {
+			i--;
+		}
+	}
+
 	this.tasks = {
-		"n": "My Tasklist",
-        "online":false,
-        "id": 0,
+		"n": "SpotonTask"+-newId,
+		"online": false,
+		"id": 0,
 		"s": 100,
-		"g": 55.51028636264,
-		listId: 0,
+		"g": 0,
+		listId: newId,
 		"c": [{
 			"n": "1 coding",
 			"g": 60,
@@ -170,26 +184,26 @@ spotonTasks.prototype = {
 		this.$canvas = $(canvasIdentifier);
 		this.ctx = this.$canvas[0].getContext('2d');
 
-			var that = this;
+		var that = this;
 		//load data from localstorage
 		if (Modernizr.localstorage === true && typeof(localStorage.getItem('tasks' + list)) == 'string' && localStorage.getItem('tasks' + list).length > 10) {
 			this.tasks = localStorage.getObject('tasks' + list);
 			this.buffer = localStorage.getObject('serverBuffer' + (list || 0));
-		    this.init2("i");
-        } else {
+			this.init2("i");
+		} else {
 			$.post("ajax.php?action=list&listId=" + list, {},
 			function(data) {
 				if (data.succes === true && typeof(data.list) == "object") {
 					that.tasks = data.list;
-				    that.online = true;
-                }
-                that.init2("d"+data.succes);
+					that.online = true;
+				}
+				that.init2("d" + data.succes);
 			},
 			'JSON');
-        }
-        },
-    init2: function(aaa){
-        //enable resizer
+		}
+	},
+	init2: function(aaa) {
+		//enable resizer
 		this.resize();
 		$(window).resize({
 			o: this
@@ -299,8 +313,6 @@ spotonTasks.prototype = {
 			e.data.o.fillSidebar(e.data.o.mouse.lastClicked);
 		});
 
-
-
 		//create a quik tasklistAccespoint
 		this.inTasksId();
 
@@ -324,28 +336,28 @@ spotonTasks.prototype = {
  */
 
 	'inTasksId': function(data) {
-		var i,tasks;
-        
+		var i, tasks;
+
 		if (arguments.length === 0) {
 			data = this.tasks;
-            this.data.tasksById = [];
-		    log('inning',data);
-            // set base task to id  zero
-		    this.data.tasksById[0] = this.tasks;
-        }
+			this.data.tasksById = [];
+			log('inning', data);
+			// set base task to id  zero
+			this.data.tasksById[0] = this.tasks;
+		}
 
-        for (i in data.c) {
-		    tasks = data.c[i];
+		for (i in data.c) {
+			tasks = data.c[i];
 			if (this.data.tasksById[tasks.id] == undefined) {
 				this.data.tasksById[tasks.id] = tasks;
 				this.data.maxId = Math.max(this.data.maxId, tasks.id);
 			}
 			// repeat for childs
 			this.inTasksId(tasks);
-		}  
-       
-        log("l",data,this.data.tasksById.length);
-        return this.data.tasksById;
+		}
+
+		log("l", data, this.data.tasksById.length);
+		return this.data.tasksById;
 	},
 
 	'hasChild': function(data) {
@@ -645,6 +657,11 @@ spotonTasks.prototype = {
  */
 
 	'push': function() {
+		if (this.tasks.online === false) {
+			this.pushNew();
+			return;
+		}
+
 		var buffer = this.data.buffer;
 		var sender = {};
 		for (i in buffer) {
@@ -1186,9 +1203,25 @@ oUser.prototype.login = function() {
 
 oUser.prototype.listSwitch = function() {
 
-	$('#listSwitcher').html($.map(user.lists, function(item, i) {
-		return '<LI data-listId="' + item.id + '">' + item.name + "</LI>";
-	}).join(""));
+    var offlineLists = [];
+    // max ofline lists: 50
+    for(i=-1;i>=-50;i--){
+		if (typeof(localStorage.getItem('tasks' + i)) == 'string' && localStorage.getItem('tasks' + i).length > 10) {
+            offlineLists.push(localStorage.getObject('tasks'+i));
+        } 
+    }
+    log(offlineLists);
+
+	listSwitcherHTML = $.map(user.lists, function(item, i) {
+	                	return '<LI data-listId="' + item.id + '">' + item.name + "</LI>";
+	                }).join("");
+
+    
+    listSwitcherHTML +=  $.map(offlineLists, function(item, i) {
+	                	return '<LI data-listId="' + item.listId + '" class="offline">' + item.n + "()</LI>";
+	                }).join("");
+
+    $('#listSwitcher').html(listSwitcherHTML);
 
 	messageBox({
 		title: 'Change list',
@@ -1201,8 +1234,8 @@ oUser.prototype.listSwitch = function() {
 	});
 };
 
-oUser.prototype.createList = function(){
-    /*HHH*/
+oUser.prototype.createList = function() {
+
 };
 
 oUser.prototype.openList = function(listId) {
@@ -1220,10 +1253,10 @@ oUser.prototype.openList = function(listId) {
 	}
 
 	this.store();
-    log(this.list);
-    var aaaa = this.list.inTasksId();
-    log("inT",aaaa);
-    this.list.buildTaskList();
+	log(this.list);
+	var aaaa = this.list.inTasksId();
+	log("inT", aaaa);
+	this.list.buildTaskList();
 	this.AF();
 
 };
