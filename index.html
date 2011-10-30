@@ -37,8 +37,9 @@
 	<div id="container">
     <header>
 			<nav>
-				<a href="newlist.do">Create a new List</a> &bull;
-				<a href="javascript:thing.push();void(0);" id="uploadListBtn">Upload List</a> 
+				<a href="javascript:user.list.push();void(0);" id="uploadListBtn">push</a> &bull;
+				<a href="javascript:user.showLogin();" id="userBtn">Login</a>
+				<a href="javascript:user.listSwitch();" id="userBtn">chaneg</a>
 			</nav>
     </header>
     <div id="main" role="main">
@@ -102,6 +103,9 @@
 	        <header><H1></H1><span id="messageClose">&otimes;</span></header>
 	        <div id="inMessage"></div>
 					<div id="specialFunctionMessage">
+						<UL id="listSwitcher" class="listSwitcher">
+							
+						</UL>
 						<form id="loginForm" class="login">
 							username:	<input type="text" name="username" id="username"><br>
 							password:  <input type="password" name="password" id="password" >
