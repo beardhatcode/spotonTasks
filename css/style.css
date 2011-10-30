@@ -270,12 +270,14 @@ header > a{
 }
 
 
-[data-specialfunction="none"]>#specialFunctionMessage *{
+#specialFunctionMessage > *{
 	display: none;				
 }
 
-[data-specialfunction="login"] .login{
-	display: block;				
+[data-specialfunction~="login"] .login,
+[data-specialfunction~="listSwitcher"] .listSwitcher
+{
+	display: block !important;				
 }
 
 
