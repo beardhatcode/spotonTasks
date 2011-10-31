@@ -6,12 +6,12 @@
 function spotonTasks(element, list) {
 
 	var newId = 0,
-	i = -1;
+	i = - 1;
 
 	while (newId === 0) {
 		if (localStorage.getItem('tasks' + i) === null) {
 			// just to be shure
-            localStorage.removeItem('serverBuffer' + i);
+			localStorage.removeItem('serverBuffer' + i);
 			newId = i;
 		} else {
 			i--;
@@ -19,7 +19,7 @@ function spotonTasks(element, list) {
 	}
 
 	this.tasks = {
-		"n": "SpotonTask"+-newId,
+		"n": "SpotonTask" + - newId,
 		"online": false,
 		"id": 0,
 		"s": 100,
@@ -184,22 +184,22 @@ spotonTasks.prototype = {
 		this.$canvas = $(canvasIdentifier);
 		this.ctx = this.$canvas[0].getContext('2d');
 
-		var that = this;
 		//load data from localstorage
 		if (Modernizr.localstorage === true && typeof(localStorage.getItem('tasks' + list)) == 'string' && localStorage.getItem('tasks' + list).length > 10) {
 			this.tasks = localStorage.getObject('tasks' + list);
 			this.buffer = localStorage.getObject('serverBuffer' + (list || 0));
 			this.init2("i");
 		} else {
-			$.post("ajax.php?action=list&listId=" + list, {},
-			function(data) {
+			user.AJAX("list&listId=" + list, {},
+			function(data,that) {
 				if (data.succes === true && typeof(data.list) == "object") {
 					that.tasks = data.list;
-					that.online = true;
-				}
+					that.tasks.online = true;
+				    that.store();
+                }
 				that.init2("d" + data.succes);
 			},
-			'JSON');
+			this);
 		}
 	},
 	init2: function(aaa) {
@@ -341,7 +341,6 @@ spotonTasks.prototype = {
 		if (arguments.length === 0) {
 			data = this.tasks;
 			this.data.tasksById = [];
-			log('inning', data);
 			// set base task to id  zero
 			this.data.tasksById[0] = this.tasks;
 		}
@@ -356,7 +355,6 @@ spotonTasks.prototype = {
 			this.inTasksId(tasks);
 		}
 
-		log("l", data, this.data.tasksById.length);
 		return this.data.tasksById;
 	},
 
@@ -612,16 +610,15 @@ spotonTasks.prototype = {
 
 		localStorage.setObject('serverBuffer' + (this.tasks.listId || 0), this.data.buffer);
 
-		log('saved', this.tasks, this.data.buffer, "saved");
 	},
 
 	'pushNew': function() {
 
 		var that = this;
-		$.post("ajax.php?action=list&listId=null", {
+		user.AJAX("list&listId=null", {
 			data: JSON.stringify(this.data.tasksById)
 		},
-		function(data) {
+		function(data,that) {
 			if (data.succes === true) {
 				that.data.buffer = {};
 				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
@@ -644,7 +641,7 @@ spotonTasks.prototype = {
 				);
 			}
 		},
-		"json");
+		that);
 
 	},
 
@@ -694,11 +691,10 @@ spotonTasks.prototype = {
 		}
 
 		var that = this;
-		$.post("ajax.php?action=list&listId=" + (this.tasks.listId || "null"), {
+		user.AJAX('list&listId=' + (this.tasks.listId || "null"), {
 			data: sender
 		},
-		function(data) {
-			console.log(data);
+		function(data, that) {
 			if (data.succes === true) {
 				that.data.buffer = {};
 				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
@@ -706,8 +702,8 @@ spotonTasks.prototype = {
 				that.data.tasksById = [that.tasks];
 				that.inTasksId();
 				that.buildTaskList();
-				log("stuff updated", that);
-			} else {
+			    //TODO:visualize confiramtion
+            } else {
 				messageBox({
 					title: 'Error',
 					type: 'error',
@@ -722,7 +718,7 @@ spotonTasks.prototype = {
 				);
 			}
 		},
-		"json");
+		this);
 
 	},
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -743,7 +739,8 @@ spotonTasks.prototype = {
  */
 
 	'fillSidebar': function(taskId) {
-		this.data.curTask = taskId;
+	    log(taskId);
+        this.data.curTask = taskId;
 		this.mouse.lastClicked = taskId;
 		$("#taskList .selected").removeClass('selected');
 		$('#taskList span[data-id=' + taskId + ']').addClass('selected');
@@ -966,7 +963,10 @@ spotonTasks.prototype = {
 
 		//draw center Bol
 		var middleStatus = (this.mouse.r < screen.sizeMiddle ? 'hover': 'normal');
-		middleStatus += (this.mouse.lastClicked === 0 ? '_selected': '');
+        /*jsl:ignore*//*jsl wants === but here it should be == */
+        //== instead of === becouse lastClicked could be a string
+        middleStatus += (this.mouse.lastClicked == 0 ? '_selected': '');
+        /*jsl:end*/
 
 		this.ctx.fillStyle = this.generateGradient(
 		0, screen.sizeMiddle, data.g, middleStatus, screen);
@@ -1097,7 +1097,6 @@ spotonTasks.prototype = {
 		default:
 			break;
 		}
-		log(what, curId);
 		this.mouse.lastClicked = curId;
 		this.fillSidebar(curId);
 
@@ -1165,7 +1164,6 @@ function oUser() {
 	if (Modernizr.localstorage === true) {
 		var userdata = localStorage.getObject('user');
 		if (typeof(userdata) == "object" && userdata !== null) {
-			log(userdata);
 			$.extend(this, userdata);
 		}
 	}
@@ -1174,6 +1172,7 @@ function oUser() {
 oUser.prototype.login = function() {
 	var that = this,
 	userdata = {};
+
 	$.post('ajax.php?action=login', $('#loginForm').serialize(), function(data) {
 		if (data.user.logged === true) {
 			userdata = data;
@@ -1193,7 +1192,6 @@ oUser.prototype.login = function() {
 		}
 
 		if (Modernizr.localstorage === true) {
-			log(userdata);
 			that.store();
 		}
 	},
@@ -1201,27 +1199,51 @@ oUser.prototype.login = function() {
 
 };
 
+/**
+ *  AJAX (prototype)
+ *  a function to connect to server
+ *
+ *  arguments:
+ *   action:    the 'action='... part may contain '&listID'
+ *   data:      data to be posted to server
+ *   callback(data,that): callback function
+ *   that: the 'that' argument send to the function
+ *
+ *  Why:
+ *   To fetch userdata as it comes in, and send sessionId (DRI DIE)
+ */
+
+oUser.prototype.AJAX = function(action, data, callback, that) {
+	var obj = that;
+	$.post('ajax.php?action=' + action, $.extend(data,{uSid:this.sid || null,uId:this.id}), function(d) {
+        if(user.logged === true){
+            $.extend(user,d.user);
+        }
+        
+        callback(d, obj);
+	},
+	'JSON');
+};
+
 oUser.prototype.listSwitch = function() {
 
-    var offlineLists = [];
-    // max ofline lists: 50
-    for(i=-1;i>=-50;i--){
+	var offlineLists = [];
+	// max ofline lists: 50
+	for (i = - 1; i >= - 50; i--) {
 		if (typeof(localStorage.getItem('tasks' + i)) == 'string' && localStorage.getItem('tasks' + i).length > 10) {
-            offlineLists.push(localStorage.getObject('tasks'+i));
-        } 
-    }
-    log(offlineLists);
+			offlineLists.push(localStorage.getObject('tasks' + i));
+		}
+	}
 
 	listSwitcherHTML = $.map(user.lists, function(item, i) {
-	                	return '<LI data-listId="' + item.id + '">' + item.name + "</LI>";
-	                }).join("");
+		return '<LI data-listId="' + item.id + '">' + item.name + "</LI>";
+	}).join("");
 
-    
-    listSwitcherHTML +=  $.map(offlineLists, function(item, i) {
-	                	return '<LI data-listId="' + item.listId + '" class="offline">' + item.n + "()</LI>";
-	                }).join("");
+	listSwitcherHTML += $.map(offlineLists, function(item, i) {
+		return '<LI data-listId="' + item.listId + '" class="offline">' + item.n + "()</LI>";
+	}).join("");
 
-    $('#listSwitcher').html(listSwitcherHTML);
+	$('#listSwitcher').html(listSwitcherHTML);
 
 	messageBox({
 		title: 'Change list',
@@ -1241,7 +1263,6 @@ oUser.prototype.createList = function() {
 oUser.prototype.openList = function(listId) {
 	listId = parseInt(listId, 10);
 	if (!isNaN(listId)) {
-		log('ggggggg', listId);
 		this.currentList = listId;
 	}
 
@@ -1253,9 +1274,6 @@ oUser.prototype.openList = function(listId) {
 	}
 
 	this.store();
-	log(this.list);
-	var aaaa = this.list.inTasksId();
-	log("inT", aaaa);
 	this.list.buildTaskList();
 	this.AF();
 
@@ -1290,10 +1308,9 @@ oUser.prototype.AF = function() {
 
 };
 
-/******************************************************************************/
-/**/
-/*   biundeings for clicks etc                      */
-/******************************************************************************/
+/******************************************************************************
+* Bindings for clicks and stuff                                                                            
+******************************************************************************/
 $(function() {
 	$('#loginForm').submit(
 	function(e) {
