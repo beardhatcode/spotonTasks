@@ -14,7 +14,9 @@ class User
 			//log in this user
 			if(isset($_SESSION['id'],$_SESSION['sid'])){
 				$this->getUser($_SESSION['id'],$_SESSION['sid']);
-			}
+            }elseif(isset($_POST['uId'],$_POST['uSid'])){
+				$this->getUser($_POST['uId'],$_POST['uSid']);
+            }
 		}else{
 			//cdde for other users				
 			$this->getUser($p_iId);
