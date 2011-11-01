@@ -10,7 +10,8 @@ function spotonTasks(element, list) {
 
 	while (newId === 0) {
 		if (localStorage.getItem('tasks' + i) === null) {
-			// just to be shure
+			log(i+"seems good");
+            // just to be shure
 			localStorage.removeItem('serverBuffer' + i);
 			newId = i;
 		} else {
@@ -143,7 +144,8 @@ function spotonTasks(element, list) {
 		}
 	};
 
-	this.init(element, list);
+    log('call\'n it',list,arguments,i);
+    this.init(element, list);
 
 	return this;
 }
@@ -184,6 +186,8 @@ spotonTasks.prototype = {
 		this.$canvas = $(canvasIdentifier);
 		this.ctx = this.$canvas[0].getContext('2d');
 
+        log('list',list);
+
 		//load data from localstorage
 		if (Modernizr.localstorage === true && typeof(localStorage.getItem('tasks' + list)) == 'string' && localStorage.getItem('tasks' + list).length > 10) {
 			this.tasks = localStorage.getObject('tasks' + list);
@@ -203,6 +207,7 @@ spotonTasks.prototype = {
 		}
 	},
 	init2: function(aaa) {
+        log(aaa,this.tasks);
 		//enable resizer
 		this.resize();
 		$(window).resize({
@@ -340,7 +345,7 @@ spotonTasks.prototype = {
 
 		if (arguments.length === 0) {
 			data = this.tasks;
-			this.data.tasksById = [];
+			this.data.tasksById = {};
 			// set base task to id  zero
 			this.data.tasksById[0] = this.tasks;
 		}
@@ -599,6 +604,11 @@ spotonTasks.prototype = {
  */
 	'store': function(changeData) {
 		localStorage.setObject('tasks' + (this.tasks.listId || 0), this.tasks);
+        
+        if(arguments.length === 0){
+            //only update the setObject tasks
+            return;
+        }
 
 		if (typeof this.data.buffer[changeData.id] == "undefined") {
 			this.data.buffer[changeData.id] = [changeData.type];
@@ -621,9 +631,17 @@ spotonTasks.prototype = {
 		function(data,that) {
 			if (data.succes === true) {
 				that.data.buffer = {};
-				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
-				that.tasks = data.list;
-				that.data.tasksById = [that.tasks];
+				
+                //clear buffer and delete  ofline localstorage list
+                localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
+			    localStorage.removeItem('tasks' + that.tasks.listId);
+                log('removed','tasks'+that.tasks.listId);
+
+                that.tasks = data.list;
+				//srore the new list in localStorage
+                that.store();
+
+				that.data.tasksById = {0:that.tasks};
 				that.inTasksId();
 				that.buildTaskList();
 			} else {
@@ -699,7 +717,7 @@ spotonTasks.prototype = {
 				that.data.buffer = {};
 				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
 				that.tasks = data.list;
-				that.data.tasksById = [that.tasks];
+				that.data.tasksById = {0:that.tasks};
 				that.inTasksId();
 				that.buildTaskList();
 			    //TODO:visualize confiramtion
@@ -1243,8 +1261,10 @@ oUser.prototype.listSwitch = function() {
 		return '<LI data-listId="' + item.listId + '" class="offline">' + item.n + "()</LI>";
 	}).join("");
 
-	$('#listSwitcher').html(listSwitcherHTML);
 
+	listSwitcherHTML += '<LI data-listId="new" class="new">New List</LI>';
+
+	$('#listSwitcher').html(listSwitcherHTML);
 	messageBox({
 		title: 'Change list',
 		html: 'Please selsect one of the folowing lists:<UL>',
@@ -1261,22 +1281,24 @@ oUser.prototype.createList = function() {
 };
 
 oUser.prototype.openList = function(listId) {
-	listId = parseInt(listId, 10);
-	if (!isNaN(listId)) {
-		this.currentList = listId;
+	ilistId = parseInt(listId, 10);
+	if (!isNaN(ilistId)) {
+		this.currentList = ilistId;
 	}
 
-	if (typeof this.currentList == 'number') {
+
+	if (typeof this.currentList == 'number' && listId != 'new') {
 		this.list = new spotonTasks("canvas", this.currentList);
 		this.store();
 	} else {
+        //unrecognized curretlist or givenlist or request for new
 		this.list = new spotonTasks("canvas");
 	}
 
 	this.store();
 	this.list.buildTaskList();
 	this.AF();
-
+    log(this.list);
 };
 
 oUser.prototype.showLogin = function() {

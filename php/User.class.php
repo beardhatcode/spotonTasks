@@ -64,12 +64,15 @@ class User
 			$updateVals = array();
 
 			foreach($aNewvalues as $newVal){	
-				if($newVal['id'] != 0){
+                
+                if($newVal['id'] != 0){
 					$updateVals['add|'.$newVal['id']]=($newVal['p']==0 ? 'null':$newVal['p']);
 					$updateVals['s|'.$newVal['id']]=round($newVal['s'],2);
 					$updateVals['g|'.$newVal['id']]=round($newVal['g'],2); 
 					$updateVals['n|'.$newVal['id']]=$newVal['n'];
-				}else{
+				}
+                
+                if($newVal['id'] == '0'){
 					$aMainTask = $newVal;				
 				}
 			}
@@ -89,10 +92,13 @@ class User
 				$oList = new TaskList($iId,$this->db,$this);
 				$oList->update($updateVals);
 			}
-		}
+		    $oList->ArrayList();
+            $this->getLists();
+            DataPlotter::succeeded();
+        }else{
+		    DataPlotter::failed();
+        }
 	
-		$oList->ArrayList();
-		DataPlotter::succeeded();
 	}
 	
 	public function getLists(){
