@@ -5,13 +5,13 @@
 
 function spotonTasks(element, list) {
 
+	// get a temporary ID
 	var newId = 0,
 	i = - 1;
 
 	while (newId === 0) {
 		if (localStorage.getItem('tasks' + i) === null) {
-			log(i+"seems good");
-            // just to be shure
+			// just to be shure
 			localStorage.removeItem('serverBuffer' + i);
 			newId = i;
 		} else {
@@ -19,92 +19,14 @@ function spotonTasks(element, list) {
 		}
 	}
 
-	this.tasks = {
-		"n": "SpotonTask" + - newId,
-		"online": false,
-		"id": 0,
-		"s": 100,
-		"g": 0,
-		listId: newId,
-		"c": [{
-			"n": "1 coding",
-			"g": 60,
-			"s": 41,
-			"c": [{
-				"g": 95,
-				"n": "1.1 PHP",
-				"s": 30,
-				"id": 2,
-				"p": 1
-			},
-			{
-				"g": 45,
-				"n": "1.2 JS",
-				"s": 70,
-				"id": 3,
-				"p": 1
-			}],
-			"id": 1,
-			"p": 0
-		},
-		{
-			"n": "2 ruling the world",
-			"g": "25",
-			"s": 19,
-			"id": 4,
-			"p": 0
-		},
-		{
-			"n": "3 Design",
-			"s": 30,
-			"g": 79.8676212088,
-			"c": [{
-				"g": "100",
-				"n": "3.1 functional",
-				"s": 50,
-				"id": 6,
-				"p": 5
-			},
-			{
-				"g": "58",
-				"n": "3.2 haha",
-				"s": 31.251,
-				"id": 7,
-				"p": 5
-			},
-			{
-				"g": 62.62087999999999,
-				"n": "3.3 sander suckt",
-				"s": 18.751,
-				"c": [{
-					"g": "34",
-					"n": "3.3.1 algem",
-					"s": 47,
-					"id": 9,
-					"p": 8
-				},
-				{
-					"g": "88",
-					"n": "3.3.2 de rest",
-					"s": 53.001,
-					"id": 10,
-					"p": 8
-				}],
-				"id": 8,
-				"p": 5
-			}],
-			"id": 5,
-			"p": 0
-		},
-		{
-			"g": "22",
-			"n": "4 lorem",
-			"s": 10,
-			"id": 11,
-			"p": 0
-		}]
-	};
-
+	// A standard task to start with
+    if(newId == -1 && user.id === 0){
+        //verry first
+    this.tasks = {"n":"L.I.F.E.G.O.E.S.O.N","online":false,"id":0,"s":100,"g":30,"listId":newId,"c":[{"n":"Friends","g":25,"s":28,"c":[{"g":"70","n":"Have fun","s":20,"id":2,"p":1},{"g":"22","n":"Heve even more fun","s":50,"id":3,"p":1},{"n":"Delete your facebook","g":"0","s":30,"id":14,"p":1}],"id":1,"p":0},{"n":"Food/Drink","g":"25","s":29,"id":4,"p":0},{"n":"Work","s":20,"g":50,"c":[{"g":"100","n":"get things done","s":33.333,"id":6,"p":5},{"n":"Call client","g":0,"s":33.333,"id":12,"p":5},{"n":"Make Tasklist","g":50,"s":33.333,"id":13,"p":5}],"id":5,"p":0},{"g":"25","n":"Sleep","s":23,"id":11,"p":0}]};
+    }else{
+        this.tasks = {"n":"Unnamed List"+ -newId,"online":false,"id":0,"s":100,"g":0,"listId":newId,"c":[{"n":"First Task","g":"0","s":100,"id":2,"p":0}]};
+    }
+	//not static data
 	this.data = {
 		buffer: {},
 		blankTask: {
@@ -144,14 +66,7 @@ function spotonTasks(element, list) {
 		}
 	};
 
-    log('call\'n it',list,arguments,i);
-    this.init(element, list);
-
-	return this;
-}
-spotonTasks.prototype = {
-	/*********** start of the prototype***********/
-	'display': {
+	this.display = {
 		full: {
 			startDeg: 1.5 * Math.PI,
 			endDeg: 3.5 * Math.PI
@@ -161,8 +76,21 @@ spotonTasks.prototype = {
 			endDeg: 2.0 * Math.PI
 		},
 		current: 'full'
-	},
+	};
 
+	// run the init
+	this.init(element, list);
+	return this;
+}
+
+/*****************************************************************************
+ * start of prototype
+ * 
+ * Constructors (init,init2)
+ ****************************************************************************/
+
+
+spotonTasks.prototype = {
 	mouse: {
 		x: 0,
 		y: 0,
@@ -170,7 +98,8 @@ spotonTasks.prototype = {
 		lastClicked: 0
 	},
 
-	/*
+
+/*
  * init (constructor function)
  * 
  * function
@@ -178,6 +107,7 @@ spotonTasks.prototype = {
  *
  * args:
  *   canvasIdentifier : jQuery selector for the canvas
+ *   list: listID of the current list
  *
  */
 	init: function(canvasIdentifier, list) {
@@ -186,137 +116,37 @@ spotonTasks.prototype = {
 		this.$canvas = $(canvasIdentifier);
 		this.ctx = this.$canvas[0].getContext('2d');
 
-        log('list',list);
-
-		//load data from localstorage
-		if (Modernizr.localstorage === true && typeof(localStorage.getItem('tasks' + list)) == 'string' && localStorage.getItem('tasks' + list).length > 10) {
-			this.tasks = localStorage.getObject('tasks' + list);
-			this.buffer = localStorage.getObject('serverBuffer' + (list || 0));
-			this.init2("i");
+		//load data from localstorage or server
+		if (Modernizr.localstorage === true && 
+            typeof(localStorage.getItem('tasks' + list)) == 'string' && 
+            localStorage.getItem('tasks' + list).length > 10) 
+               {
+		    	this.tasks = localStorage.getObject('tasks' + list);
+		    	this.buffer = localStorage.getObject('serverBuffer' + (list || 0));
+		    	this.init2();
 		} else {
 			user.AJAX("list&listId=" + list, {},
-			function(data,that) {
+			function(data, that) {
 				if (data.succes === true && typeof(data.list) == "object") {
 					that.tasks = data.list;
 					that.tasks.online = true;
-				    that.store();
-                }
-				that.init2("d" + data.succes);
+					that.store();
+				}
+				that.init2();
 			},
 			this);
 		}
 	},
-	init2: function(aaa) {
-        log(aaa,this.tasks);
+    
+
+
+/*
+ * initi2 (helper function)
+ *  finishes the job of init
+ */
+    init2: function() {
 		//enable resizer
 		this.resize();
-		$(window).resize({
-			o: this
-		},
-		function(e) {
-			e.data.o.resize();
-		});
-
-		//enable keyboard interaction
-		$(document.documentElement).keyup({
-			o: this
-		},
-		function(e) {
-			//only on not input elements
-			if (e.target.nodeName.toLowerCase() != 'input') {
-
-				switch ((e.shiftKey ? "+": "-") + e.keyCode) {
-				case '-46':
-					// del
-				case '+46':
-					// shift + del
-					e.data.o.remove();
-					break;
-				case '-45':
-					// ins
-					e.data.o.add('neighbour');
-					break;
-				case '+45':
-					// shift + ins
-					e.data.o.add('child');
-					break;
-				case '-33':
-					//pageUp
-				case '-38':
-					// Arrow Up
-					e.data.o.keyboardNav('turnCCW');
-					break;
-				case '-34':
-					// Page Down
-				case '-40':
-					// Arrow Down
-					e.data.o.keyboardNav('turnCW');
-					break;
-				case '-37':
-					// Arrow left
-					e.data.o.keyboardNav('lvlDown');
-					break;
-				case '-39':
-					// Arrow right
-					e.data.o.keyboardNav('lvlUp');
-					break;
-				case '-36':
-					//home
-					e.data.o.keyboardNav('goHome');
-					break;
-				case '-68':
-					// d
-					$('.isDone[data-id=' + e.data.o.data.curTask + ']').click();
-					break;
-				case '-67':
-					//c
-				case '-71':
-					//g
-					$('.g[type=range]').focus();
-					break;
-				case '-83':
-					//s
-					$('.s[type=range]').focus();
-					break;
-				case '-78':
-					//n
-					$('#n').select().focus();
-					break;
-				default:
-					break;
-				}
-
-			} else {
-				// on input elments
-				switch (e.keyCode) {
-				case 27:
-					//esc
-					$("input").blur();
-					break;
-				default:
-					break;
-				}
-			}
-		});
-
-		this.$canvas.mousemove({
-			o:
-			this
-		},
-		function(e) {
-			var screen = e.data.o.data.screen,
-			boundingRect = e.data.o.ctx.canvas.getBoundingClientRect();
-			e.data.o.mouse.x = e.clientX - boundingRect.left;
-			e.data.o.mouse.y = e.clientY - boundingRect.top;
-			e.data.o.mouse.r = Math.sqrt(
-			Math.pow((screen.centerX - e.pageX), 2) + Math.pow((screen.centerY - e.pageY), 2));
-		}).click({
-			o: this
-		},
-		function(e) {
-			e.data.o.mouse.lastClicked = e.data.o.mouse.hover;
-			e.data.o.fillSidebar(e.data.o.mouse.lastClicked);
-		});
 
 		//create a quik tasklistAccespoint
 		this.inTasksId();
@@ -329,7 +159,7 @@ spotonTasks.prototype = {
 		return this;
 	},
 
-	/*
+/*
  * inTasksId
  *
  * function
@@ -344,15 +174,15 @@ spotonTasks.prototype = {
 		var i, tasks;
 
 		if (arguments.length === 0) {
+			// set base task to id  zero
 			data = this.tasks;
 			this.data.tasksById = {};
-			// set base task to id  zero
 			this.data.tasksById[0] = this.tasks;
 		}
 
 		for (i in data.c) {
 			tasks = data.c[i];
-			if (this.data.tasksById[tasks.id] == undefined) {
+			if (typeof this.data.tasksById[tasks.id] == "undefined") {
 				this.data.tasksById[tasks.id] = tasks;
 				this.data.maxId = Math.max(this.data.maxId, tasks.id);
 			}
@@ -363,7 +193,18 @@ spotonTasks.prototype = {
 		return this.data.tasksById;
 	},
 
-	'hasChild': function(data) {
+/*
+ * hasChild
+ *
+ * function:
+ *  returns TRUE if {data} has a child
+ *  returns FALSE if {data} has no childs
+ *
+ * arguments:
+ *   data: task OBJECT
+ * 
+ */
+    'hasChild': function(data) {
 		if (typeof data.c == 'object' && data.c !== null && data.c.length > 0) {
 			return true;
 		} else {
@@ -371,13 +212,13 @@ spotonTasks.prototype = {
 		}
 	},
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *                     start of task changing methods                        *
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	/* updateValue (setter)
+/* updateValue (setter)
  *
  * function
  *   set values
@@ -394,15 +235,15 @@ spotonTasks.prototype = {
  */
 	'updateValue': function(value, type) {
 		switch (type) {
-		case 'n':
+		case 'n': // change name
 			var task = this.data.tasksById[this.data.curTask];
 			task.n = value;
 			this.buildTaskList();
 			break;
-		case 's':
+		case 's': // change size
 			this.updateS(this.data.curTask, value);
 			break;
-		case 'g':
+		case 'g': // change completion
 			this.updateG(this.data.curTask, value);
 			break;
 		default:
@@ -410,10 +251,8 @@ spotonTasks.prototype = {
 			break;
 
 		}
-		this.store({
-			type: type,
-			id: this.data.curTask
-		});
+
+		this.store({type: type,	id: this.data.curTask});
 	},
 
 	/* Updaters 
@@ -431,14 +270,16 @@ spotonTasks.prototype = {
 		var i, task = this.data.tasksById[taskId];
 
 		if (typeof this.data.tasksById[task.p] == "undefined") {
-			log("ERR: can't find tasks neighbours");
-			//TODO: alert user
+		    messageBox({
+                title: 'Could not modify',
+                html:'You man not resize the main task' 
+            });
 			return;
 		}
 
 		var group = this.data.tasksById[task.p].c,
-		otherTot = 0,
-		notLocked = [];
+		    otherTot = 0,
+		    notLocked = [];
 
 		// find neighbour tasks to fill the gap
 		for (i in group) {
@@ -449,16 +290,18 @@ spotonTasks.prototype = {
 		}
 
 		if (notLocked.length === 0) {
-			log("ERR: no neighbours to modify");
-			return; // no neigbours to modify
-			//TODO: alert user
+		    messageBox({
+                title: 'Could not modify',
+                html:'We could not modify the size of the selected task(group). This could be due: <ul><LI>This is the only tasks</LI></UL>' 
+            });
+            return; 
 		}
 
 		// update task
 		task.s = newVal * 1;
 
 		var curTot = newVal * 1 + otherTot,
-		change = (100 - curTot);
+		    change = (100 - curTot);
 
 		for (i in notLocked) {
 			var t = notLocked[i];
@@ -474,13 +317,13 @@ spotonTasks.prototype = {
 	},
 
 	'updateG': function(taskId, newVal) {
-		var i, task = this.data.tasksById[taskId];
+		var task = this.data.tasksById[taskId];
 		task.g = newVal;
 		pTask = this.data.tasksById[task.p];
 
 		//recalculate parent if there is a one
 		if (typeof pTask != 'undefined') {
-			var gain = 0;
+			var gain = 0,i;
 			for (i in pTask.c) {
 				gain += (pTask.c[i].g * (pTask.c[i].s / 100));
 			}
@@ -492,9 +335,8 @@ spotonTasks.prototype = {
 		$('span[data-id=' + task.id + ']').attr('data-g', Math.round(task.g));
 	},
 
-	/*end of updaters*/
 
-	/* add
+/* add
  *
  * function
  *   add a new task based on the default task (data.blankTask)
@@ -510,8 +352,7 @@ spotonTasks.prototype = {
 			parent = this.data.tasksById[parent.p];
 		}
 
-		var blankTask = $.extend(true, {},
-		this.data.blankTask);
+		var blankTask = $.extend(true, {}, this.data.blankTask);
 		this.data.maxId += 1;
 		blankTask.id = this.data.maxId;
 		blankTask.p = parent.id;
@@ -522,7 +363,7 @@ spotonTasks.prototype = {
 			blankTask.s = 100;
 			parent.c = [blankTask];
 		} else {
-			//extra task, resize
+			//extra task, resize from 0
 			parent.c.push(blankTask);
 			this.updateS(blankTask.id, 100 / parent.c.length);
 		}
@@ -530,13 +371,10 @@ spotonTasks.prototype = {
 		this.mouse.lastClicked = blankTask.id;
 		this.buildTaskList();
 		this.fillSidebar(blankTask.id);
-		this.store({
-			id: blankTask.id,
-			type: 'add'
-		});
+		this.store({id: blankTask.id,type: 'add'});
 	},
 
-	/* remove
+/* remove
  *
  * function
  *   - remove the current selected task afterconfirming
@@ -570,12 +408,11 @@ spotonTasks.prototype = {
 
 		} else {
 			var task = this.data.tasksById[id],
-			parent = this.data.tasksById[task.p],
-			i;
+			    parent = this.data.tasksById[task.p],
+			    i;
 
 			if (typeof parent == 'undefined') {
 				log('ERR: could not remove , because base task');
-				delete task.c;
 				//TODO alert user
 				return;
 			}
@@ -589,26 +426,31 @@ spotonTasks.prototype = {
 			this.mouse.lastClicked = parent.id;
 			this.buildTaskList();
 			this.fillSidebar(parent.id);
-			this.store({
-				id: id,
-				type: "del"
-			});
+			this.store({id: id,type: "del"});
 		}
 	},
 
 	/*
  * store
  *
- * function store tasks in localstorage
+ * function 
+ *   store tasks in localstorage and makes a buffer to
+ *   send to the server 
+ * 
+ * Args
+ *  [ChangeData]: a obj {id: ...,type: ...}
+ *                  where id is the ID of the task to change
+ *                  and type is n,g,s,add or del
  *
+ *          if omited only localstorage
  */
 	'store': function(changeData) {
 		localStorage.setObject('tasks' + (this.tasks.listId || 0), this.tasks);
-        
-        if(arguments.length === 0){
-            //only update the setObject tasks
-            return;
-        }
+
+		if (arguments.length === 0) {
+			//only update the setObject tasks
+			return;
+		}
 
 		if (typeof this.data.buffer[changeData.id] == "undefined") {
 			this.data.buffer[changeData.id] = [changeData.type];
@@ -622,48 +464,8 @@ spotonTasks.prototype = {
 
 	},
 
-	'pushNew': function() {
 
-		var that = this;
-		user.AJAX("list&listId=null", {
-			data: JSON.stringify(this.data.tasksById)
-		},
-		function(data,that) {
-			if (data.succes === true) {
-				that.data.buffer = {};
-				
-                //clear buffer and delete  ofline localstorage list
-                localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
-			    localStorage.removeItem('tasks' + that.tasks.listId);
-                log('removed','tasks'+that.tasks.listId);
-
-                that.tasks = data.list;
-				//srore the new list in localStorage
-                that.store();
-
-				that.data.tasksById = {0:that.tasks};
-				that.inTasksId();
-				that.buildTaskList();
-			} else {
-				messageBox({
-					title: 'Error',
-					type: 'error',
-					html: 'An error occured while creating a new list!<br><ul><li>' + data.warnings.join('<LI>') + '</ul>',
-					buttons: [{
-						name: 'Cancel',
-						type: 'close'
-					}],
-					extra: data.requestedActions.join(" ")
-				}
-
-				);
-			}
-		},
-		that);
-
-	},
-
-	/*
+/*
  * push 
  *
  * function
@@ -717,11 +519,13 @@ spotonTasks.prototype = {
 				that.data.buffer = {};
 				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
 				that.tasks = data.list;
-				that.data.tasksById = {0:that.tasks};
+				that.data.tasksById = {
+					0: that.tasks
+				};
 				that.inTasksId();
 				that.buildTaskList();
-			    //TODO:visualize confiramtion
-            } else {
+				//TODO:visualize confiramtion
+			} else {
 				messageBox({
 					title: 'Error',
 					type: 'error',
@@ -739,7 +543,61 @@ spotonTasks.prototype = {
 		this);
 
 	},
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+    
+/*
+ * pushNew 
+ *
+ * function
+ * 		push a new list to the server
+ *
+ */
+	'pushNew': function() {
+
+		var that = this;
+		user.AJAX("list&listId=null", {
+			data: JSON.stringify(this.data.tasksById)
+		},
+		function(data, that) {
+			if (data.succes === true) {
+				that.data.buffer = {};
+
+				//clear buffer and delete  ofline localstorage list
+				localStorage.setObject('serverBuffer' + (that.tasks.listId || 0), that.data.buffer);
+				localStorage.removeItem('tasks' + that.tasks.listId);
+				log('removed', 'tasks' + that.tasks.listId);
+
+				that.tasks = data.list;
+				//srore the new list in localStorage
+				that.store();
+
+				that.data.tasksById = {
+					0: that.tasks
+				};
+				that.inTasksId();
+				that.buildTaskList();
+			} else {
+				messageBox({
+					title: 'Error',
+					type: 'error',
+					html: 'An error occured while creating a new list!<br><ul><li>' + data.warnings.join('<LI>') + '</ul>',
+					buttons: [{
+						name: 'Cancel',
+						type: 'close'
+					}],
+					extra: data.requestedActions.join(" ")
+				}
+
+				);
+			}
+		},
+		that);
+
+	},
+    
+    
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *                      end of task changing methods                         *
  *                                                                           *
@@ -747,7 +605,7 @@ spotonTasks.prototype = {
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	/* fillSidebar
+/* fillSidebar
  *
  * function
  *   set the ranges an the inputs of the sidebar
@@ -757,10 +615,10 @@ spotonTasks.prototype = {
  */
 
 	'fillSidebar': function(taskId) {
-	    log(taskId);
-        this.data.curTask = taskId;
+		this.data.curTask = taskId;
 		this.mouse.lastClicked = taskId;
-		$("#taskList .selected").removeClass('selected');
+		
+        $("#taskList .selected").removeClass('selected');
 		$('#taskList span[data-id=' + taskId + ']').addClass('selected');
 
 		var task = this.data.tasksById[taskId];
@@ -769,15 +627,33 @@ spotonTasks.prototype = {
 		$('.g').val(Math.round(task.g)).attr('value', Math.round(task.g));
 
 		// you can't change the gain of a task that has childs
-		if (!this.hasChild(task)) {
-			$(".g").removeAttr('disabled');
+		var $completedEditor = $('#completedEditor'),
+            $completedControls = $('input',$completedEditor);
+        
+        if (!this.hasChild(task)) {
+			$completedEditor.removeClass('disabled');
+            $completedControls.removeAttr('disabled');
 		} else {
-			$(".g").attr('disabled', 'disabled');
+			$completedEditor.addClass('disabled');
+            $completedControls.attr('disabled', 'disabled');
 		}
+        
+		var $inportanceEditor = $('#inportanceEditor'),
+            $inportanceControls = $('input',$inportanceEditor);
+        
+        //log(task.p != null ? this.data.tasksById[task.p].c.length:"baseTask");
+
+        if( task.id > 0 && this.data.tasksById[task.p].c.length > 1 ){
+            $inportanceEditor.removeClass('disabled');
+            $inportanceControls.removeAttr('disabled');
+		} else {
+			$inportanceEditor.addClass('disabled');
+            $inportanceControls.attr('disabled', 'disabled');
+        }
 
 	},
 
-	/*
+/*
  * buildTasksList
  *
  * function
@@ -798,7 +674,7 @@ spotonTasks.prototype = {
 			$('<span></span>').addClass(((this.mouse.lastClicked == data.id) ? 'selected': null)).attr({
 				'data-id': data.id,
 				'data-g': Math.round(data.g)
-			}).html(data.n).append(
+			}).text(data.n||"...").append(
 			$('<input type=checkbox>').attr({
 				'data-id': data.id,
 				'checked': (data.g == 100 ? true: false)
@@ -812,7 +688,7 @@ spotonTasks.prototype = {
 			$('<span></span>').addClass(((this.mouse.lastClicked == data.id) ? 'selected': null)).attr({
 				'data-id': data.id,
 				'data-g': Math.round(data.g)
-			}).text(data.n)).append($tList);
+			}).text(data.n||"...")).append($tList);
 
 			if (arguments.length === 0) {
 				$tList = $('<ul></ul>').append($tList);
@@ -824,7 +700,7 @@ spotonTasks.prototype = {
 
 	},
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *                       end of HTML edits                                   *
  *                                                                           *
@@ -832,11 +708,11 @@ spotonTasks.prototype = {
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	/*
+/*
  * drawPart (helper method)
  *
  * function
- *   the method that actualy draws th tasks on the canvas
+ *   the method that actualy draws the tasks on the canvas
  *
  *   args
  *     R	-	The maximum radius
@@ -869,7 +745,8 @@ spotonTasks.prototype = {
 		this.ctx.fill();
 		this.ctx.stroke();
 	},
-	/*
+
+/*
  * generateGradient (helper method)
  *
  * function
@@ -895,8 +772,8 @@ spotonTasks.prototype = {
 		return radgrad;
 	},
 
-	/*
- * drawCalc (helper Method
+/*
+ * drawCalc (helper Method)
  *
  * function
  *   calculate parameters for drawing the right size at the right spot
@@ -962,13 +839,18 @@ spotonTasks.prototype = {
  */
 
 	'draw': function(data) {
-		var i, screen = this.data.screen;
-
+		var i, 
+            screen = this.data.screen;
+        
+        // default value for data
 		data = ((arguments.length === 0 || data == "AF") ? this.tasks: data);
+
 		var startDeg = this.display.startDeg,
-		endDeg = this.display.endDeg,
-		subLvl = 0;
-		this.ctx.clearRect(0, 0, screen.canvasX, screen.canvasY, 1000);
+		    endDeg = this.display.endDeg,
+		    subLvl = 0;
+		
+        //clear canvas
+        this.ctx.clearRect(0, 0, screen.canvasX, screen.canvasY, 1000);
 
 		this.mouse.isHovering = false;
 
@@ -981,13 +863,12 @@ spotonTasks.prototype = {
 
 		//draw center Bol
 		var middleStatus = (this.mouse.r < screen.sizeMiddle ? 'hover': 'normal');
-        /*jsl:ignore*//*jsl wants === but here it should be == */
-        //== instead of === becouse lastClicked could be a string
-        middleStatus += (this.mouse.lastClicked == 0 ? '_selected': '');
-        /*jsl:end*/
+		/*jsl:ignore*/
+		//== instead of === becouse lastClicked could be a string
+		middleStatus += (this.mouse.lastClicked == 0 ? '_selected': '');
+		/*jsl:end*/
 
-		this.ctx.fillStyle = this.generateGradient(
-		0, screen.sizeMiddle, data.g, middleStatus, screen);
+		this.ctx.fillStyle = this.generateGradient(0, screen.sizeMiddle, data.g, middleStatus, screen);
 
 		this.ctx.beginPath();
 		this.ctx.arc(screen.centerX, screen.centerY, screen.sizeMiddle, this.display.startDeg, this.display.endDeg);
@@ -996,7 +877,7 @@ spotonTasks.prototype = {
 		this.ctx.stroke();
 	},
 
-	/*
+/*
  * resize (called at resize)
  *
  * function
@@ -1118,23 +999,39 @@ spotonTasks.prototype = {
 		this.mouse.lastClicked = curId;
 		this.fillSidebar(curId);
 
-	},
-
-	/*
- * AF (animation frame function)
- *
- */
-
-	'AF': function() {
-		window.requestAnimFrame(thing.AF, thing.ctx.canvas);
-		thing.draw('AF');
 	}
 
 };
 
+/*
+ * messageBox (human interaction function)
+ *
+ * function 
+ *     displays a box with text a title and buttons
+ *
+ * arguments
+ *   data: object with:
+ *      {title : "Message",
+ *       type: 'normal',
+ *       html: '',
+ *       buttons: {...}
+ *       extra= 'space seperated extra data-specialfunction'
+ *
+ *       buttons= array of: {
+ *          name: "test",
+ *          type: "data-btn-type arg",
+ *          act: function(arg){},
+ *          agr: 'agument for act'
+ *
+ *
+ *       }
+ */
+
+
 function messageBox(data) {
 	var $message = $('#message'),
-	$buttons = $('<div id="buttonContainer"></div>');
+	    $buttons = $('<div id="buttonContainer"></div>'),
+        $buttonContainer = $('#buttonContainer');
 	$message.attr('data-type', data.type || 'normal');
 	$message.find('h1').html(data.title || 'Message');
 	$message.find('#inMessage').html(data.html);
@@ -1148,16 +1045,14 @@ function messageBox(data) {
 
 	for (var btnId in data.buttons) {
 		var btn = data.buttons[btnId];
-		$('<button>').text(btn.name).click({
-			btn: btn
-		},
-		function(e) {
-			try {
-				e.data.btn.act(e.data.btn.arg);
-			} catch(err) {}
-		}
-
-		).attr('data-type', btn.type).appendTo($buttons);
+		
+        $('<button>').text(btn.name).click({btn: btn},
+		            function(e) {
+                    //try-catch to catch act not defined
+                    try {
+			        	e.data.btn.act(e.data.btn.arg);
+			        } catch(e) {}
+        		}).attr('data-type', btn.type).appendTo($buttons);
 	}
 
 	if (typeof data.extra == "string") {
@@ -1166,13 +1061,21 @@ function messageBox(data) {
 		$message.attr('data-specialfunction', 'none');
 	}
 
-	$('#buttonContainer').replaceWith($buttons);
-
+	$buttonContainer.replaceWith($buttons);
+    //TODO a nicer way
+    setTimeout(function(){ $('button',$buttons).first().focus();},1);
 	$('#messageOverlay').addClass('show');
 	$('#messageClose , #buttonContainer>button').click(function() {
 		$('#messageOverlay').removeClass('show messageOnly');
 	});
 }
+
+
+/*
+ * oUser
+ *
+ * defaults
+ */
 
 function oUser() {
 	this.id = 0;
@@ -1187,6 +1090,13 @@ function oUser() {
 	}
 }
 
+/*
+ * login
+ *
+ * function
+ *   check login, get lists, save sid
+ *
+ */
 oUser.prototype.login = function() {
 	var that = this,
 	userdata = {};
@@ -1197,14 +1107,18 @@ oUser.prototype.login = function() {
 			that.lists = data.lists;
 			that.logged = data.logged;
 			$.extend(that, data.user);
-		} else {
+	        messageBox({
+	        	title: 'Login succesfull',
+	         	html: 'You are logged in!'
+	        });
+		}else{
 			messageBox({
 				title: 'Login',
 				extra: 'login',
 				html: 'Username and password did not match please try again:',
 				buttons: [{
 					name: "cancel",
-					type: "cansel"
+					type: "cancel"
 				}]
 			});
 		}
@@ -1217,32 +1131,33 @@ oUser.prototype.login = function() {
 
 };
 
-/**
- *  AJAX (prototype)
- *  a function to connect to server
+/*
+ * showLogin
  *
- *  arguments:
- *   action:    the 'action='... part may contain '&listID'
- *   data:      data to be posted to server
- *   callback(data,that): callback function
- *   that: the 'that' argument send to the function
+ * function
+ *   shows login screen
  *
- *  Why:
- *   To fetch userdata as it comes in, and send sessionId (DRI DIE)
  */
 
-oUser.prototype.AJAX = function(action, data, callback, that) {
-	var obj = that;
-	$.post('ajax.php?action=' + action, $.extend(data,{uSid:this.sid || null,uId:this.id}), function(d) {
-        if(user.logged === true){
-            $.extend(user,d.user);
-        }
-        
-        callback(d, obj);
-	},
-	'JSON');
+oUser.prototype.showLogin = function() {
+	messageBox({
+		title: 'Login',
+		extra: 'login',
+		html: 'To login please enter your username and password',
+		buttons: [{
+			name: "cansel",
+			type: "cansel"
+		}]
+	});
 };
 
+
+/* 
+ * listSwitch
+ *
+ *  function
+ *    show listSwitsher and updates it with offline data
+ */
 oUser.prototype.listSwitch = function() {
 
 	var offlineLists = [];
@@ -1261,7 +1176,6 @@ oUser.prototype.listSwitch = function() {
 		return '<LI data-listId="' + item.listId + '" class="offline">' + item.n + "()</LI>";
 	}).join("");
 
-
 	listSwitcherHTML += '<LI data-listId="new" class="new">New List</LI>';
 
 	$('#listSwitcher').html(listSwitcherHTML);
@@ -1276,43 +1190,43 @@ oUser.prototype.listSwitch = function() {
 	});
 };
 
-oUser.prototype.createList = function() {
 
-};
-
+/*
+ * openList
+ *
+ * function
+ *  starts a list (and creates it if not eexists)
+ *
+ * arguments
+ *  listId - listid (omitit: last from localstorage)
+ */
 oUser.prototype.openList = function(listId) {
-	ilistId = parseInt(listId, 10);
+	var ilistId = parseInt(listId, 10);
 	if (!isNaN(ilistId)) {
 		this.currentList = ilistId;
 	}
-
 
 	if (typeof this.currentList == 'number' && listId != 'new') {
 		this.list = new spotonTasks("canvas", this.currentList);
 		this.store();
 	} else {
-        //unrecognized curretlist or givenlist or request for new
+		//unrecognized curretlist or givenlist or request for new
 		this.list = new spotonTasks("canvas");
 	}
 
 	this.store();
 	this.list.buildTaskList();
 	this.AF();
-    log(this.list);
+	log(this.list);
 };
 
-oUser.prototype.showLogin = function() {
-	messageBox({
-		title: 'Login',
-		extra: 'login',
-		html: 'To login please enter your username and password',
-		buttons: [{
-			name: "cansel",
-			type: "cansel"
-		}]
-	});
-};
-
+/*
+ * store
+ *
+ * function
+ *   save the users data in localstorage
+ *
+ */
 oUser.prototype.store = function() {
 	localStorage.setObject('user', {
 		currentList: user.currentList,
@@ -1324,17 +1238,158 @@ oUser.prototype.store = function() {
 	});
 };
 
+/*
+ * AF
+ *
+ * stat animation frame for current list
+ *
+ */
 oUser.prototype.AF = function() {
 	window.requestAnimFrame(user.AF, user.list.ctx.canvas);
 	user.list.draw('AF');
 
 };
 
+/*
+ *  AJAX (prototype)
+ *  a function to connect to server
+ *
+ *  arguments:
+ *   action:    the 'action='... part may contain '&listID'
+ *   data:      data to be posted to server
+ *   callback(data,that): callback function
+ *   that: the 'that' argument send to the function
+ *
+ *  Why:
+ *   To fetch userdata as it comes in, and send sessionId (DRI DIE)
+ */
+
+oUser.prototype.AJAX = function(action, data, callback, that) {
+	var obj = that;
+	$.post('ajax.php?action=' + action, $.extend(data, {
+		uSid: this.sid || null,
+		uId: this.id
+	}), function(d) {
+		if (user.logged === true) {
+			$.extend(user, d.user);
+		}
+
+		callback(d, obj);
+	},
+	'JSON');
+};
+
 /******************************************************************************
 * Bindings for clicks and stuff                                                                            
 ******************************************************************************/
 $(function() {
-	$('#loginForm').submit(
+
+    //resizer
+	$(window).resize(function(e) {
+		user.list.resize();
+	});
+   
+
+    // Keyboard navrigation
+	$(document.documentElement).keyup(function(e) {
+      switch(true){
+        // Dont do things on an input
+          case  (e.target.nodeName.toLowerCase() == 'input'):
+              log("input");
+			switch (e.keyCode) {
+				case 27://esc
+					$("input").blur();
+					break;
+				default:
+					break;
+				}
+        break;
+        // If a message box is displayed
+        case $('#messageOverlay').hasClass('show'):
+			switch (e.keyCode) {
+				case 27://esc
+		            $('#messageOverlay').removeClass('show messageOnly');
+					break;
+				case 37:	// Arrow left
+					if(e.target.nodeName.toLowerCase() == 'button'){
+                        setTimeout(function(){$(e.target).prev('button').focus();},1);
+                    }
+                    break;
+				case 39:	// Arrow right
+					if(e.target.nodeName.toLowerCase() == 'button'){
+					    setTimeout(function(){$(e.target).next('button').focus();},1);
+                    }
+                    break;
+				default:
+					break;
+				}
+        break;
+        // standard Keyboard interaction
+        default:
+            switch ((e.shiftKey ? "+": "-") + e.keyCode) {
+				case '-46': // del
+				case '+46': // shift + del
+					user.list.remove();
+					break;
+				case '-45':	// ins
+					user.list.add('neighbour');
+					break;
+				case '+45':	// shift + ins
+					user.list.add('child');
+					break;
+				case '-38':	// Arrow Up
+					user.list.keyboardNav('turnCCW');
+					break;
+				case '-40':	// Arrow Down
+					user.list.keyboardNav('turnCW');
+					break;
+				case '-33':	//pageUp
+				case '-37':	// Arrow left
+					user.list.keyboardNav('lvlDown');
+					break;
+				case '-34':	// Page Down
+				case '-39':	// Arrow right
+					user.list.keyboardNav('lvlUp');
+					break;
+				case '-36': //home
+					user.list.keyboardNav('goHome');
+					break;
+				case '-68':	// d
+					//TODO: direct G not better?
+                    $('.isDone[data-id=' + user.list.data.curTask + ']').click();
+					break;
+				case '-67':	//c
+				case '-71':	//g
+					$('.g[type=range]').focus();
+					break;
+				case '-83':	//s
+					$('.s[type=range]').focus();
+					break;
+				case '-78':	//n
+					$('#n').select().focus();
+					break;
+				default:
+					break;
+                }
+            break;
+		    }
+        });
+
+    // mouse on <canvas> navrigation
+	user.list.$canvas.mousemove(function(e) {
+			var screen = user.list.data.screen,
+			boundingRect = user.list.ctx.canvas.getBoundingClientRect();
+			user.list.mouse.x = e.clientX - boundingRect.left;
+			user.list.mouse.y = e.clientY - boundingRect.top;
+			user.list.mouse.r = Math.sqrt(
+			Math.pow((screen.centerX - e.pageX), 2) + Math.pow((screen.centerY - e.pageY), 2));
+		}).click(	function(e) {
+			user.list.mouse.lastClicked = user.list.mouse.hover;
+			user.list.fillSidebar(user.list.mouse.lastClicked);
+		});
+
+
+    $('#loginForm').submit(
 	function(e) {
 		e.preventDefault();
 		user.login();
@@ -1353,10 +1408,7 @@ $(function() {
 	$(".isDone").live('change', function(e) {
 		var id = $(this).attr('data-id');
 		user.list.updateG(id, ($(this).is(':checked') ? 100: 0));
-		user.list.store({
-			type: 'g',
-			id: id
-		});
+		user.list.store({type: 'g',	id: id});
 	});
 
 	//handle updates
@@ -1411,8 +1463,9 @@ Storage.prototype.getObject = function(key) {
 	return JSON.parse(this.getItem(key));
 };
 
-var user = new oUser(),
-curerentList = user.openList();
+// must be called user for animation frame
+var user = new oUser();
+user.openList();
 
 // verry bad things to get the CSS attr(value) working for the rages
 $(".g,.s").change(function() {

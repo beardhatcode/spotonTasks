@@ -37,9 +37,9 @@
 	<div id="container">
     <header>
 			<nav>
-				<a href="javascript:user.list.push();void(0);" id="uploadListBtn">push</a> &bull;
-				<a href="javascript:user.showLogin();" id="userBtn">Login</a>
-				<a href="javascript:user.listSwitch();" id="userBtn">chaneg</a>
+<!--				<a href="javascript:user.list.push();void(0);" id="uploadListBtn">push</a> &bull;
+<a href="javascript:user.showLogin();" id="userBtn">Login</a>-->
+				<a href="javascript:user.listSwitch();" id="ChangeListBtn">change/add List</a>
 			</nav>
     </header>
     <div id="main" role="main">
@@ -48,25 +48,25 @@
 	</section>
 	<section id="sideBar">
 			
-			<section id="nameContainer">
+			<section id="nameEditor">
 						<input type="text" name="n"		id="n"		 class="n" value="Loading..">
 			</section>
 		
-			<section>
+			<section id="inportanceEditor">
 				<label for="s">Inportance</label>
 				<input type="range" name="s" class="s"	min=1 max=99 value=50>
 				<input name="s" min="1" max="99" type="number" class="s" value="" size=3>
 				<br>
 				<span class="info">Change the procentual size of the task compared to it's parent. </span>
 			</section>
-			<section>
+			<section id="completedEditor">
 				<label for="g">Completed</label>
 				<input type="range" name="g" class="g"	min=0 max=100 value=50>
 				<input name="g" min="0" max="100" type="number" class="g" value="" size=3>
 				<br>
 				<span class="info">Change the procentual completion</span>
 			</section>
-			<section>
+			<section id="familyEditor">
 				<button id="addNeighbour">Add neighbour</button><button id="addChild">Add child</button>
 				<button id="removeTask">Remove</button>
 			</section>
